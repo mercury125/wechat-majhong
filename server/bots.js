@@ -7,7 +7,7 @@ function botAction(hand,seat) {
   const actions=legalActions(hand,seat);
   const ack=actions.find(action=>action.kind==='ack');
   if(ack)return {...ack,code:hand.wallCode};
-  // Test opponents leave self-draw wins for the human to exercise.
+  // Preserve the existing bot policy: self-draw wins are left to human players.
   const priority=actions.find(action=>action.kind.endsWith('Kong'))||
     actions.find(action=>action.kind==='pon')||
     actions.find(action=>action.kind==='float'&&action.tile===hand.lastDraw);

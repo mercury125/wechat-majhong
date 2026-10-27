@@ -2,7 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createHand, act, legalActions, publicHand, remaining, conservation } = require('../miniprogram/lib/engine');
-const fixture = require('../docs/fixtures/shuffle-v1.json');
+const fixture = require('../docs/fixtures/shuffle-v1-friends-v3.json');
 
 function dealt(seedHex = fixture.seedHex) {
   let hand = createHand({...fixture,seedHex,startedAt:'2026-01-01T00:00:00.000Z'});
@@ -18,7 +18,7 @@ test('commitment acknowledgement precedes concealed dealing; fixed deal vector',
   assert.equal(hand.head,0);
   hand=act(hand,3,{id:'ack3',kind:'ack',code:hand.wallCode});
   assert.deepEqual(hand.players.map(p=>p.hand),fixture.expected.initialHandsBySeat);
-  assert.equal(remaining(hand),66);
+  assert.equal(remaining(hand),54);
   assert.equal(hand.actor,2);
   assert.equal(hand.lastDraw,null);
   assert.ok(conservation(hand));
@@ -37,6 +37,22 @@ test('invalid/stale phases and duplicate commands cannot mutate state', () => {
   assert.throws(()=>act(next,2,{id:'chi',kind:'chi'}));
   assert.throws(()=>act(next,1,{id:'ron',kind:'win'}));
   assert.ok(conservation(next));
+});
+
+test('every dealer opens with fourteen tiles and other seats with thirteen, without an extra draw',()=>{
+  for(let dealerSeat=0;dealerSeat<4;dealerSeat++){
+    let hand=createHand({...fixture,dealerSeat});
+    for(const seat of [3,1,0,2])hand=act(hand,seat,{id:'count-ack-'+seat,kind:'ack',code:hand.wallCode});
+    const counts=Array.from({length:4},(_,seat)=>seat===dealerSeat?14:13);
+    assert.deepEqual(hand.players.map(player=>player.hand.length),counts);
+    assert.equal(hand.head,53);assert.equal(remaining(hand),54);assert.equal(hand.lastDraw,null);
+    for(let viewer=0;viewer<4;viewer++)assert.deepEqual(publicHand(hand,viewer).players.map(player=>player.hand.length),counts);
+    hand=act(hand,dealerSeat,{id:'count-opening-discard',...legalActions(hand,dealerSeat).find(action=>action.kind==='discard')});
+    assert.equal(hand.players[dealerSeat].hand.length,13);
+    for(let seat=0;seat<4;seat++)if(hand.phase==='responses'&&hand.pending.responses[seat]===null)hand=act(hand,seat,{id:'count-pass-'+seat,kind:'pass'});
+    assert.equal(hand.actor,(dealerSeat+1)%4);assert.equal(hand.players[hand.actor].hand.length,14);
+    assert.equal(remaining(hand),53);assert.ok(conservation(hand));
+  }
 });
 
 test('live projections contain no wall, seed or opponents concealed IDs', () => {
@@ -81,13 +97,13 @@ test('every viewer gets draw position and ordered public discard cues without co
     assert.equal(view.drawSeat,actor);assert.equal(view.lastDraw,seat===actor?drawn:null);
     assert.deepEqual(view.discardEvents.map(e=>Object.keys(e)),[['seq','seat','tileId','tsumogiri','handCount','hadDraw']]);
     assert.equal(view.discardEvents[0].seq,1,'private response/deal event counts are not exposed');
-    assert.equal(view.discardEvents[0].handCount,11);assert.equal(view.discardEvents[0].hadDraw,false);
+    assert.equal(view.discardEvents[0].handCount,14);assert.equal(view.discardEvents[0].hadDraw,false);
     if(seat!==actor)assert.ok(view.players[actor].hand.every(id=>id===null));
   }
   hand=act(hand,actor,{id:'motion-draw-cut',kind:'discard',tile:drawn});
   const cue=publicHand(hand,0).discardEvents.at(-1);
   assert.deepEqual(publicHand(hand,0).discardEvents.map(event=>event.seq),[1,2]);
-  assert.equal(cue.tileId,drawn);assert.equal(cue.handCount,11);assert.equal(cue.hadDraw,true);assert.equal(cue.tsumogiri,true);
+  assert.equal(cue.tileId,drawn);assert.equal(cue.handCount,14);assert.equal(cue.hadDraw,true);assert.equal(cue.tsumogiri,true);
   const publicIds=new Set(hand.players.flatMap(player=>player.discards.map(discard=>discard.id)));
   for(const event of publicHand(hand,0).discardEvents)assert.ok(publicIds.has(event.tileId));
   assert.deepEqual(publicHand(hand,0).discardEvents,publicHand(hand,1).discardEvents);

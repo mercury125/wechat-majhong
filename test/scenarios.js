@@ -14,7 +14,7 @@ function scenario(options={}) {
   hand.players=Array.from({length:4},(_,seat)=>({hand:[],melds:(meldInputs[seat]||[]).map(meld=>({kind:meld.kind,type:meld.type,tiles:Array.from({length:meld.kind==='pon'?3:4},()=>take(meld.type)),from:meld.from===undefined?seat:meld.from})),discards:[],floated:[]}));
   for(let seat=0;seat<4;seat++)hand.players[seat].hand=(options.hands&&options.hands[seat]||[]).map(take);
   for(let seat=0;seat<4;seat++){
-    const target=(seat===0?11:10)-3*hand.players[seat].melds.length;
+    const target=(seat===0?14:13)-3*hand.players[seat].melds.length;
     while(hand.players[seat].hand.length<target){const id=[...stock].find(id=>Math.floor(id/4)!==wildcard);stock.delete(id);hand.players[seat].hand.push(id);}
     if(hand.players[seat].hand.length!==target)throw new Error('Invalid fixture hand size');
   }

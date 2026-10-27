@@ -1,7 +1,8 @@
 'use strict';
 
 const { sha256 } = require('./vendor/sha256');
-const RULES_VERSION = 'friends-v2';
+const RULES_VERSION = 'friends-v3';
+const SUPPORTED_RULES = ['friends-v2', RULES_VERSION];
 const SHUFFLE_VERSION = 'fy-hmac-sha256-v1';
 
 function utf8(text) {
@@ -22,7 +23,7 @@ function validateContext(context) {
   if (!context || typeof context.matchId !== 'string' || !context.matchId || utf8(context.matchId).length > 256) throw new Error('对局编号无效');
   if (!Number.isInteger(context.handNo) || context.handNo < 1 || context.handNo > 0xffffffff) throw new Error('小局编号无效');
   if (!Number.isInteger(context.dealerSeat) || context.dealerSeat < 0 || context.dealerSeat > 3) throw new Error('庄家座位编号无效');
-  if (context.rulesVersion !== RULES_VERSION || context.shuffleVersion !== SHUFFLE_VERSION) throw new Error('不支持此规则或洗牌版本');
+  if (!SUPPORTED_RULES.includes(context.rulesVersion) || context.shuffleVersion !== SHUFFLE_VERSION) throw new Error('不支持此规则或洗牌版本');
 }
 
 function contextBytes(context) {
@@ -74,4 +75,4 @@ function wallCode(context, wall) {
   return 'sha256:' + sha256(utf8('wechat-mahjong/wall/v1\0').concat(contextBytes(context), wall));
 }
 
-module.exports = { RULES_VERSION, SHUFFLE_VERSION, utf8, contextBytes, seedBytes, validateContext, validateWall, streamBlock, sample, shuffle, wallCode };
+module.exports = { RULES_VERSION, SUPPORTED_RULES, SHUFFLE_VERSION, utf8, contextBytes, seedBytes, validateContext, validateWall, streamBlock, sample, shuffle, wallCode };

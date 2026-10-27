@@ -6,7 +6,7 @@ const {acceptRoom,fail:setError,safeAreaStyle}=require('../../lib/room-state');
 const cloudAssets=require('../../lib/cloud-assets');
 const characterChoices=()=>cosmetics.characters.map(character=>({...character,sheetUrl:cloudAssets.assetUrl(character.sheet)}));
 Page({
-  data:{safeStyle:'',user:null,name:'',joinCode:'',room:null,rooms:[],seatCards:[],handsPerMatch:8,busy:false,error:'',development:config.development,characters:characterChoices(),selectedCharacter:'ironclad'},
+  data:{safeStyle:'',user:null,name:'',joinCode:'',room:null,rooms:[],seatCards:[],canManageBots:false,handsPerMatch:8,busy:false,error:'',development:config.development,characters:characterChoices(),selectedCharacter:'ironclad'},
   onLoad(query={}){
     this.setData({safeStyle:safeAreaStyle(wx)});
     this.invite=typeof query.room==='string'?query.room.trim().toUpperCase():'';
@@ -61,7 +61,7 @@ Page({
   accept(room){
     if(!acceptRoom(this.data.room,room))return;
     const role=room.characters&&room.characters[room.seat];
-    this.setData({room,seatCards:room.seats.map((player,seat)=>({seat,player,ready:room.ready[seat]})),handsPerMatch:room.settings.handsPerMatch,error:'',...(role?{selectedCharacter:role}:{})});
+    this.setData({room,seatCards:room.seats.map((player,seat)=>({seat,player,ready:room.ready[seat]})),canManageBots:!room.testMode&&room.ownerId===this.data.user?.id&&(!room.match||room.match.status!=='active'),handsPerMatch:room.settings.handsPerMatch,error:'',...(role?{selectedCharacter:role}:{})});
     wx.setStorageSync('lastRoom',room.code);
     if(room.match&&room.match.status==='active'&&!this.navigating&&!this.stayInLobby)this.table();
   },
@@ -70,6 +70,8 @@ Page({
   ready(){return this.send({kind:'ready',ready:!this.data.room.ready[this.data.room.seat]});},
   saveSettings(){return this.send({kind:'settings',handsPerMatch:Number(this.data.handsPerMatch)});},
   sit(event){this.send({kind:'sit',seat:Number(event.currentTarget.dataset.seat)});},
+  addBot(event){return this.send({kind:'addBot',seat:Number(event.currentTarget.dataset.seat)});},
+  removeBot(event){return this.send({kind:'removeBot',seat:Number(event.currentTarget.dataset.seat)});},
   leave(){return this.run(async()=>{await api.command(this.data.room,{kind:'leave'});if(this.stop)this.stop();this.setData({room:null});});},
   history(){wx.navigateTo({url:'/pages/replays/index'});},
   calculator(){wx.navigateTo({url:'/pages/verify/index'});},

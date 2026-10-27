@@ -3,7 +3,7 @@
 const { randomBytes, randomUUID, randomInt, createHash } = require('node:crypto');
 const { EventEmitter } = require('node:events');
 const { createHand, act, publicHand, clone, isActionId } = require('../miniprogram/lib/engine');
-const { RULES_VERSION, SHUFFLE_VERSION } = require('../miniprogram/lib/shuffle');
+const { RULES_VERSION, SUPPORTED_RULES, SHUFFLE_VERSION } = require('../miniprogram/lib/shuffle');
 const { canonical } = require('../miniprogram/lib/replay');
 const cosmetics = require('../miniprogram/lib/cosmetics');
 const {botAction,automaticAction}=require('./bots');
@@ -23,7 +23,7 @@ function nameValue(value) {
 }
 
 const COMMAND_KEYS = ['id','kind','tile','type','code','seat','handsPerMatch','ready','matchId','handNo'];
-const ROOM_COMMANDS = new Set(['sit','leave','ready','settings']);
+const ROOM_COMMANDS = new Set(['sit','leave','ready','settings','addBot','removeBot']);
 const RECEIPT_LIMIT = 4096;
 const CALL_KINDS = new Set(['pon','exposedKong','concealedKong','addedKong']);
 const CALL_NOTICE_LABELS = { pon:'碰', exposedKong:'明杠', concealedKong:'暗杠', addedKong:'补杠', win:'胡' };
@@ -156,16 +156,25 @@ class Service {
     const room = {code,ownerId:user.id,seats:[user.id,null,null,null],ready:[false,false,false,false],characters:cosmetics.defaults.slice(),emotes:[null,null,null,null],settings:{handsPerMatch:positive(body.handsPerMatch===undefined?8:body.handsPerMatch,'每场局数')},matchId:null,revision:1,receipts:[],testMode:body.testMode===true,bots:[]};
     this.store.transaction(()=>{
       if(room.testMode){
-        for(let seat=1;seat<4;seat++){
-          const id=randomUUID();
-          this.store.db.prepare('INSERT INTO users(id,identity,name) VALUES(?,?,?)').run(id,'bot:'+code+':'+seat,'机器人'+'一二三'[seat-1]+'号');
-          room.seats[seat]=id;room.bots.push(id);
-        }
+        for(let seat=1;seat<4;seat++)this.addBot(room,seat);
         this.advanceAutomatic(room,null);
       }
       this.store.saveRoom(room);
     });
     return this.view(room,user);
+  }
+
+  addBot(room,seat) {
+    room.bots=room.bots||[];
+    let id=room.bots.find(id=>!room.seats.includes(id));
+    if(!id){
+      id=randomUUID();
+      this.store.db.prepare('INSERT INTO users(id,identity,name) VALUES(?,?,?)').run(id,'bot:'+room.code+':'+id,'机器人'+'一二三'[room.bots.length]+'号');
+      room.bots.push(id);
+    }
+    room.seats[seat]=id;room.ready[seat]=true;
+    if(room.characters)room.characters[seat]=cosmetics.defaults[seat];
+    if(room.emotes)room.emotes[seat]=null;
   }
 
   receipt(room, userId, id) {
@@ -184,7 +193,7 @@ class Service {
       if (match) this.store.saveMatch(match);
       this.store.saveRoom(room);
       if (match&&match.status==='complete'&&!wasComplete) {
-        const participants=room.testMode?match.seats.filter(participant=>participant.playerId===room.ownerId):match.seats;
+        const participants=match.seats.filter(participant=>!participant.bot&&!room.bots?.includes(participant.playerId));
         for(const participant of participants) this.store.db.prepare('INSERT OR IGNORE INTO history(user_id,match_id) VALUES(?,?)').run(participant.playerId,match.id);
         for(const participant of participants) this.store.prune(participant.playerId,this.store.user(participant.playerId).history_limit);
       }
@@ -251,12 +260,27 @@ class Service {
       requireTrue(!other,409,'有玩家正在其他对局中');
     }
     const id=randomUUID();const at=this.clock();
-    const match={schemaVersion:1,id,roomCode:room.code,testMode:room.testMode===true,settings:clone(room.settings),rulesVersion:RULES_VERSION,shuffleVersion:SHUFFLE_VERSION,seats:room.seats.map(id=>({playerId:id,name:this.store.user(id).name})),status:'active',startedAt:at,endedAt:null,scores:[0,0,0,0],continueReady:[false,false,false,false],hands:[createHand({matchId:id,handNo:1,dealerSeat:this.dealer(),seedHex:this.seed(),startedAt:at})]};
+    const match={schemaVersion:1,id,roomCode:room.code,testMode:room.testMode===true,settings:clone(room.settings),rulesVersion:RULES_VERSION,shuffleVersion:SHUFFLE_VERSION,seats:room.seats.map(id=>({playerId:id,name:this.store.user(id).name,bot:!!room.bots?.includes(id)})),status:'active',startedAt:at,endedAt:null,scores:[0,0,0,0],continueReady:[false,false,false,false],hands:[createHand({matchId:id,handNo:1,dealerSeat:this.dealer(),seedHex:this.seed(),startedAt:at})]};
     room.matchId=id;room.ready=[false,false,false,false];room.controls={};room.callNotices=[];
     return match;
   }
 
   roomCommand(user, room, input, seat) {
+    if(input.kind==='addBot'||input.kind==='removeBot') {
+      requireTrue(!room.testMode&&room.ownerId===user.id,403,'只有普通房间的房主可以添加或移除机器人');
+      const target=input.seat;
+      requireTrue(Number.isInteger(target)&&target>=0&&target<4,400,'请选择有效座位');
+      if(input.kind==='addBot'){
+        requireTrue(room.seats[target]===null,409,'该座位已有人，或房间已满');
+        this.addBot(room,target);
+        return room.seats.every(Boolean)&&room.ready.every(Boolean)?this.startMatch(room):null;
+      }
+      requireTrue(room.seats[target]&&room.bots?.includes(room.seats[target]),409,'该座位不是机器人');
+      room.seats[target]=null;room.ready[target]=false;
+      if(room.characters)room.characters[target]=cosmetics.defaults[target];
+      if(room.emotes)room.emotes[target]=null;
+      return null;
+    }
     if(input.kind==='sit') {
       requireTrue(Number.isInteger(input.seat)&&input.seat>=0&&input.seat<4&&room.seats[input.seat]===null,409,'请选择空座位');
       room.seats[seat]=null;room.ready[seat]=false;room.seats[input.seat]=user.id;room.ready[input.seat]=false;
@@ -268,7 +292,10 @@ class Service {
       room.seats[seat]=null;room.ready[seat]=false;
       if(room.characters)room.characters[seat]=cosmetics.defaults[seat];
       if(room.emotes)room.emotes[seat]=null;
-      if(room.ownerId===user.id) room.ownerId=room.seats.find(Boolean)||null;
+      if(room.ownerId===user.id){
+        room.ownerId=room.seats.find(id=>id&&!room.bots?.includes(id))||null;
+        if(!room.ownerId){room.seats=[null,null,null,null];room.ready=[false,false,false,false];room.bots=[];}
+      }
       return null;
     }
     if(input.kind==='ready') {
@@ -287,7 +314,7 @@ class Service {
 
   gameCommand(room, match, seat, input) {
     const hand=match.hands[match.hands.length-1];
-    requireTrue(match.rulesVersion===RULES_VERSION&&hand.rulesVersion===RULES_VERSION,409,'此对局使用了已停止支持的规则版本');
+    requireTrue(SUPPORTED_RULES.includes(match.rulesVersion)&&hand.rulesVersion===match.rulesVersion,409,'此对局使用了已停止支持的规则版本');
     requireTrue(input.matchId===match.id&&input.handNo===hand.handNo,409,'操作指向已过期的对局或小局');
     if(input.kind==='continue') {
       requireTrue(hand.phase==='finished',409,'本局尚未结束');

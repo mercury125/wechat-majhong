@@ -7,7 +7,7 @@ const {wallCode}=require('../miniprogram/lib/shuffle');
 const {verifyMatch}=require('../miniprogram/lib/replay');
 const {scenario}=require('./scenarios');
 const {table}=require('./helpers');
-const plain=[0,1,2,9,10,11,18,19,20,26,26];
+const plain=[0,1,2,9,10,11,18,19,20,21,22,23,26,26];
 
 function prepare(app,options){
   const match=app.store.match(app.store.room(app.code).matchId),hand=scenario(options);
@@ -26,7 +26,7 @@ test('auto-win takes priority over auto-cut, and only an actual draw can be auto
 
 test('auto-cut floats a drawn wildcard only when legal and never substitutes an older tile',()=>{
   for(const remaining of [5,4,0]){
-    const hand=scenario({hands:[[5,0,1,2,9,10,11,18,19,26,26]],remaining});
+    const hand=scenario({hands:[[5,0,1,2,9,10,11,18,19,21,22,23,26,26]],remaining});
     hand.lastDraw=hand.players[0].hand.find(id=>Math.floor(id/4)===5);
     const action=automaticAction(hand,0,{autoCut:true});
     if(remaining===5)assert.deepEqual(action,{kind:'float',tile:hand.lastDraw});else assert.equal(action,null);
@@ -63,7 +63,7 @@ test('skip-calls passes before a discard is broadcast and hides both exposed and
     app.service.changes.on(app.code,()=>phases.push(app.store.match(app.store.room(app.code).matchId).hands[0].phase));
     result=app.command(0,{kind:'discard',tile:hand.players[0].hand.find(id=>Math.floor(id/4)===9)});
     assert.deepEqual(phases,['own'],'other clients never receive an eligible-call waiting window');assert.equal(result.match.hand.pending,null);
-    prepare(app,{hands:[[9,9,9,9,0,1,2,18,19,26,26]]});
+    prepare(app,{hands:[[9,9,9,9,0,1,2,18,19,21,22,23,26,26]]});
     let mine=app.service.setControls(app.users[0],app.code,{skipCalls:true});
     assert.ok(!mine.match.hand.actions.some(action=>action.kind.includes('Kong')));
     assert.throws(()=>app.command(0,{kind:'concealedKong',type:9}),/开启免鸣/);
@@ -90,8 +90,8 @@ test('public call notices follow confirmed Pon, all Kong kinds and wins, while P
   const cases=[
     {kind:'pon',label:'碰',hands:[[9],[9,9]],seat:1},
     {kind:'exposedKong',label:'明杠',hands:[[9],[9,9,9]],seat:1},
-    {kind:'concealedKong',label:'暗杠',hands:[[9,9,9,9,0,1,2,18,19,26,26]],seat:0},
-    {kind:'addedKong',label:'补杠',hands:[[9,0,1,2,18,19,26,26]],melds:[[{kind:'pon',type:9,from:1}]],seat:0},
+    {kind:'concealedKong',label:'暗杠',hands:[[9,9,9,9,0,1,2,18,19,21,22,23,26,26]],seat:0},
+    {kind:'addedKong',label:'补杠',hands:[[9,0,1,2,18,19,21,22,23,26,26]],melds:[[{kind:'pon',type:9,from:1}]],seat:0},
     {kind:'win',label:'胡',hands:[plain],seat:0},
     {kind:'pass',hands:[[9],[9,9]],seat:1},
   ];

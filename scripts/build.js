@@ -13,8 +13,8 @@ for(const item of manifest.files){
   const bundled=item.file.endsWith('.png')?fs.readFileSync(path.join(root,'assets/tiles/miniprogram',item.file)):data;
   fs.writeFileSync(path.join(output,item.file),bundled);
 }
-const fixture=require('../docs/fixtures/shuffle-v1.json');
-fs.writeFileSync(path.join(root,'miniprogram/lib/example.js'),"'use strict';\n// Generated from docs/fixtures/shuffle-v1.json by npm run build.\nmodule.exports = "+JSON.stringify(fixture,null,2)+';\n');
+const fixture=require('../docs/fixtures/shuffle-v1-friends-v3.json');
+fs.writeFileSync(path.join(root,'miniprogram/lib/example.js'),"'use strict';\n// Generated from docs/fixtures/shuffle-v1-friends-v3.json by npm run build.\nmodule.exports = "+JSON.stringify(fixture,null,2)+';\n');
 
 // Cloud functions are uploaded as isolated directories, so copy the shared
 // pure-JavaScript rule modules they need into the function package.

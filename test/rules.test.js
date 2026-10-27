@@ -10,26 +10,34 @@ function ids(types) {
 }
 
 test('natural, substituted, natural-use wildcard and Jiahei wins', () => {
-  const types = [0,1,2,9,10,11,18,19,20,26,26];
+  const types = [0,1,2,9,10,11,18,19,20,21,22,23,26,26];
   const natural = ids(types);
   assert.equal(classifyWin(natural, [], 5, null), 'black');
-  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,5,26,26]), [], 5, 20), 'wildcard');
+  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,5,21,22,23,26,26]), [], 5, 20), 'wildcard');
   assert.equal(classifyWin(natural, [], 1, natural[1]), 'jiahei');
   assert.equal(classifyWin(natural, [], 1, null), 'black');
   assert.equal(classifyWin(natural, [], 1, natural[0]), 'black');
   assert.equal(classifyWin(natural, [], 0, natural[0]), 'black');
-  assert.equal(classifyWin(natural, [], 26, natural[10]), null);
-  const pairWild = ids([0,1,2,9,10,11,18,19,20,25,26]);
-  assert.equal(classifyWin(pairWild, [], 26, pairWild[10]), 'wildcard');
+  assert.equal(classifyWin(natural, [], 26, natural.at(-1)), null);
+  const pairWild = ids([0,1,2,9,10,11,18,19,20,21,22,23,25,26]);
+  assert.equal(classifyWin(pairWild, [], 26, pairWild.at(-1)), 'wildcard');
 });
 
 test('meld counts, same-suit boundaries and wildcard cap', () => {
-  assert.equal(classifyWin(ids([0,1,2,9,10,11,26,26]), [{kind:'pon'}], 5, null), 'black');
-  assert.equal(classifyWin(ids([26,26]), [{},{},{}], 5, null), 'black');
-  assert.equal(classifyWin(ids([7,8,9,10,11,12,18,19,20,26,26]), [], 5, null), null);
-  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,20,5,5]), [], 5, null), null);
-  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,20,26]), [], 5, null), null);
+  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,20,26,26]), [{kind:'pon'}], 5, null), 'black');
+  assert.equal(classifyWin(ids([26,26]), [{},{},{},{}], 5, null), 'black');
+  assert.equal(classifyWin(ids([26,26]), [{},{},{},{},{}], 5, null), null);
+  assert.equal(classifyWin(ids([7,8,9,10,11,12,18,19,20,21,22,23,26,26]), [], 5, null), null);
+  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,20,21,22,23,5,5]), [], 5, null), null);
+  assert.equal(classifyWin(ids([0,1,2,9,10,11,18,19,20,21,22,23,26]), [], 5, null), null);
   for (let suit = 0; suit < 3; suit++) assert.equal(wildcardAfter(suit * 9 + 8), suit * 9);
+});
+
+test('new wins need four melds while legacy records retain their three-meld rules',()=>{
+  const oldHand=ids([0,1,2,9,10,11,18,19,20,26,26]);
+  assert.equal(classifyWin(oldHand,[],5,null),null);
+  assert.equal(classifyWin(oldHand,[],5,null,'friends-v2'),'black');
+  assert.equal(classifyWin(oldHand,[],5,null,'unsupported'),null);
 });
 
 test('all score table examples use exact integer score units', () => {

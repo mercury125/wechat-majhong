@@ -1,7 +1,7 @@
 'use strict';
 
 const { createHand, act, clone } = require('./engine');
-const { RULES_VERSION, SHUFFLE_VERSION, validateContext, validateWall, shuffle, wallCode } = require('./shuffle');
+const { SUPPORTED_RULES, SHUFFLE_VERSION, validateContext, validateWall, shuffle, wallCode } = require('./shuffle');
 
 function canonical(value) {
   if (Array.isArray(value)) return '[' + value.map(canonical).join(',') + ']';
@@ -85,7 +85,7 @@ function verifyMatch(match, observed) {
     requireTrue(match && match.schemaVersion === 1 && Array.isArray(match.hands) && match.hands.length > 0, '整场牌谱无效');
     requireTrue(Array.isArray(match.seats) && match.seats.length === 4, '对局必须有四个座位');
     requireTrue(match.seats.every(seat=>seat&&typeof seat.playerId==='string'&&seat.playerId&&typeof seat.name==='string') && new Set(match.seats.map(seat=>seat.playerId)).size===4, '玩家座位无效或重复');
-    requireTrue(match.rulesVersion===RULES_VERSION&&match.shuffleVersion===SHUFFLE_VERSION, '不支持此对局规则或洗牌版本');
+    requireTrue(SUPPORTED_RULES.includes(match.rulesVersion)&&match.shuffleVersion===SHUFFLE_VERSION, '不支持此对局规则或洗牌版本');
     requireTrue(match.settings && Number.isInteger(match.settings.handsPerMatch) && match.settings.handsPerMatch > 0 && match.settings.handsPerMatch <= 0xffffffff, '每场局数无效');
   })) return report.result();
   let scores = [0,0,0,0];

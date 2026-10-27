@@ -59,7 +59,7 @@ function legalActions(hand, seat) {
     return actions;
   }
   if (hand.phase !== 'own' || hand.actor !== seat) return actions;
-  if (hand.canWin && classifyWin(player.hand, player.melds, hand.wildcardType, hand.lastDraw)) actions.push({ kind: 'win' });
+  if (hand.canWin && classifyWin(player.hand, player.melds, hand.wildcardType, hand.lastDraw, hand.rulesVersion)) actions.push({ kind: 'win' });
   player.hand.forEach(id => {
     if (typeOf(id) !== hand.wildcardType) actions.push({ kind: 'discard', tile: id });
     else if (remaining(hand) > 4) actions.push({ kind: 'float', tile: id });
@@ -148,7 +148,8 @@ function act(original, seat, action, timestamp) {
     event('ack', { code: action.code });
     if (hand.acknowledgements.every(Boolean)) {
       hand.phase = 'own';
-      for (let i = 0; i < 40; i++) draw((hand.dealerSeat + i % 4) % 4, 'head', true);
+      const rounds = hand.rulesVersion === 'friends-v2' ? 10 : 13;
+      for (let i = 0; i < rounds * 4; i++) draw((hand.dealerSeat + i % 4) % 4, 'head', true);
       draw(hand.dealerSeat, 'head', true);
       hand.canWin = true;
     }
@@ -194,7 +195,7 @@ function act(original, seat, action, timestamp) {
     pay(action.kind, seat, undefined, trigger);
     draw(seat, 'tail', false);
   } else if (action.kind === 'win') {
-    const classification = classifyWin(player.hand, player.melds, hand.wildcardType, hand.lastDraw);
+    const classification = classifyWin(player.hand, player.melds, hand.wildcardType, hand.lastDraw, hand.rulesVersion);
     pay(classification, seat, undefined, hand.events.length + 2);
     finish('win', classification);
   }

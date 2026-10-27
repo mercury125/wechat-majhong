@@ -7,7 +7,7 @@ const vm=require('node:vm');
 const {createRequire}=require('node:module');
 const {createHand,act,publicHand,legalActions}=require('../miniprogram/lib/engine');
 const {tableView}=require('../miniprogram/lib/presentation');
-const fixture=require('../docs/fixtures/shuffle-v1.json');
+const fixture=require('../docs/fixtures/shuffle-v1-friends-v3.json');
 const {scenario}=require('./scenarios');
 
 function apiModule(wx,config={apiBase:'http://127.0.0.1:8787',development:true}){
@@ -309,7 +309,7 @@ test('clicking an opponent avatar opens a focused interaction menu for that play
 });
 
 test('browser settlement shows all four hands, deltas and final scores, with a one-time streak effect',()=>{
-  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]]}),before=roomView(hand,0),after={...roomView(act(hand,0,{id:'streak-result',kind:'win'}),0),revision:2};after.match.winStreak={seat:0,count:3};
+  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]]}),before=roomView(hand,0),after={...roomView(act(hand,0,{id:'streak-result',kind:'win'}),0),revision:2};after.match.winStreak={seat:0,count:3};
   const timers=[],{context,elements}=browser({setTimeout(fn,ms){timers.push({fn,ms});return timers.length;},clearTimeout(){}});context.before=before;context.after=after;
   vm.runInContext("room=before;user={id:'user0'};render();updateRoom(after)",context);assert.match(elements.get('win-effects').innerHTML,/三连胜/);assert.match(elements.get('win-effects').innerHTML,/Triple Kill/);assert.equal(timers[0].ms,2200);
   timers[0].fn();let html=elements.get('room').innerHTML;assert.match(html,/大局结束 · 最终分数/);assert.equal((html.match(/class="settlement-player"/g)||[]).length,4);assert.equal((html.match(/本局 [+-]/g)||[]).length,4);
@@ -319,7 +319,7 @@ test('browser settlement shows all four hands, deltas and final scores, with a o
 });
 
 test('native settlement reveals every hand and keeps streak effects out of cold reconnections',()=>{
-  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]]}),before=roomView(hand,1),won=act(hand,0,{id:'native-streak-result',kind:'win'}),after={...roomView(won,1),revision:2};after.match.winStreak={seat:0,count:2};
+  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]]}),before=roomView(hand,1),won=act(hand,0,{id:'native-streak-result',kind:'win'}),after={...roomView(won,1),revision:2};after.match.winStreak={seat:0,count:2};
   const timers=[],view=page('table',{}, {},undefined,{setTimeout(fn,ms){timers.push({fn,ms});return timers.length;},clearTimeout(){}});
   view.accept(before);assert.equal(view.data.vm.result,null);view.accept(after);assert.equal(view.data.winEffect.badge.english,'Double Kill');assert.equal(timers[0].ms,2200);assert.equal(view.data.vm.result.complete,true);
   assert.equal(view.data.vm.result.scores.length,4);for(const row of view.data.vm.result.scores){assert.deepEqual(row.hand.map(face=>face.id),won.players[row.seat].hand.slice().sort((a,b)=>a-b));assert.equal(row.delta,(won.result.deltas[row.seat]>0?'+':'')+won.result.deltas[row.seat]/2);}
@@ -328,7 +328,7 @@ test('native settlement reveals every hand and keeps streak effects out of cold 
 });
 
 test('native settlement includes all four physical tiles of added and concealed Kongs',()=>{
-  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]]}),snapshot=roomView(act(hand,0,{id:'settlement-kongs',kind:'win'}),0);
+  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]]}),snapshot=roomView(act(hand,0,{id:'settlement-kongs',kind:'win'}),0);
   const melds=[{kind:'addedKong',from:1,tiles:[0,1,2,3]},{kind:'concealedKong',from:0,tiles:[40,41,42,43]}];
   snapshot.match.hand.players[0].melds=melds;
   const view=tableView(snapshot);assert.equal(view.players[0].melds[0].tiles.length,3,'the table stacks the fourth tile');
@@ -522,7 +522,7 @@ test('native decision previews keep multiple Kongs distinct and submit only the 
 });
 
 test('browser win effects play once for a live win and show settlement after their timer',()=>{
-  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]]});
+  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]]});
   const before=roomView(hand,1),after=roomView(act(hand,0,{id:'effect-win',kind:'win'}),1);
   after.revision=2;after.match.seats[0].name='甲<祝贺>';
   const timers=[],{context,elements}=browser({setTimeout(fn,ms){timers.push({fn,ms});return timers.length;},clearTimeout(){}});
@@ -537,7 +537,7 @@ test('browser win effects play once for a live win and show settlement after the
 });
 
 test('native win effects identify the winner, survive rendering, and do not replay on reconnect',()=>{
-  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]]}),before=roomView(hand,1),after=roomView(act(hand,0,{id:'native-effect-win',kind:'win'}),1);
+  const hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]]}),before=roomView(hand,1),after=roomView(act(hand,0,{id:'native-effect-win',kind:'win'}),1);
   after.revision=2;const timers=[];
   const view=page('table',{watchRoom:()=>()=>{}},{},undefined,{setTimeout(fn,ms){timers.push({fn,ms});return timers.length;},clearTimeout(){}});
   view.accept(before);view.accept(after);assert.equal(view.data.winEffect.winner,after.match.seats[0].name);assert.equal(view.data.winEffect.sparks.length,12);
@@ -748,6 +748,42 @@ test('native table mirrors the browser depth, role backs, card backs, and safe-a
   assert.match(tableWxss,/env\(safe-area-inset-right\)/);
 });
 
+
+test('normal-room bot controls are owner-only and submit the selected seat in both clients',async()=>{
+  const waiting=roomView(createHand({...fixture}),0),commands=[];
+  waiting.match=null;waiting.matchId=null;waiting.testMode=false;
+  waiting.seats[2]=null;waiting.seats[3].bot=true;
+  const lobby=page('lobby',{async command(room,input){commands.push({...input});return {...room,revision:room.revision+1};}},{setStorageSync(){}});
+  lobby.data.user={id:waiting.ownerId};lobby.accept(waiting);
+  assert.equal(lobby.data.canManageBots,true);
+  await lobby.addBot({currentTarget:{dataset:{seat:'2'}}});
+  await lobby.removeBot({currentTarget:{dataset:{seat:'3'}}});
+  assert.deepEqual(commands,[{kind:'addBot',seat:2},{kind:'removeBot',seat:3}]);
+  lobby.data.user={id:'other-owner'};lobby.accept({...lobby.data.room,revision:4});
+  assert.equal(lobby.data.canManageBots,false);
+  lobby.data.user={id:waiting.ownerId};lobby.accept({...lobby.data.room,revision:5,testMode:true});
+  assert.equal(lobby.data.canManageBots,false);
+  lobby.stayInLobby=true;lobby.accept({...lobby.data.room,revision:6,testMode:false,match:{status:'active'}});
+  assert.equal(lobby.data.canManageBots,false);
+  const markup=fs.readFileSync('miniprogram/pages/lobby/index.wxml','utf8');
+  assert.match(markup,/bindtap="addBot"/);assert.match(markup,/bindtap="removeBot"/);
+
+  const web=browser(),requests=[],button={dataset:{botKind:'addBot',botSeat:'2'}};
+  web.context.document.querySelectorAll=selector=>selector==='[data-bot-kind]'?[button]:[];
+  web.context.ownerId=waiting.ownerId;web.context.waiting=waiting;
+  web.context.fetch=async(url,options)=>{
+    requests.push({url,body:JSON.parse(options.body)});
+    return {ok:true,json:async()=>({...waiting,revision:requests.length+1})};
+  };
+  vm.runInContext('user={id:ownerId};room=waiting;render();',web.context);
+  assert.match(web.elements.get('room').innerHTML,/data-bot-kind="addBot" data-bot-seat="2"/);
+  assert.match(web.elements.get('room').innerHTML,/data-bot-kind="removeBot" data-bot-seat="3"/);
+  await button.onclick();button.dataset={botKind:'removeBot',botSeat:'3'};await button.onclick();
+  assert.deepEqual(requests.map(item=>({kind:item.body.kind,seat:item.body.seat})),commands);
+  for(const change of ['user={id:"other-owner"}','user={id:ownerId};room.testMode=true','room.testMode=false;room.match={status:"active"}']){
+    vm.runInContext(change,web.context);assert.equal(vm.runInContext('botControls()',web.context),'');
+  }
+});
 
 test('the opposite avatar follows the measured hand edge and reuses unchanged layout',()=>{
   let reads=0,completed=0;

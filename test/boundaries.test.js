@@ -29,7 +29,7 @@ test('float boundary checks before mutation; consecutive floats increment before
 
 test('concealed and added Kongs replace from the last tile and can self-draw',()=>{
   for(const kind of ['concealedKong','addedKong']){
-    const options=kind==='concealedKong'?{hands:[[9,9,9,9,0,1,2,18,19,26,26]]}:{hands:[[9,0,1,2,18,19,26,26]],melds:[[{kind:'pon',type:9,from:1}],[],[],[]]};
+    const options=kind==='concealedKong'?{hands:[[9,9,9,9,0,1,2,18,19,21,22,23,26,26]]}:{hands:[[9,0,1,2,18,19,21,22,23,26,26]],melds:[[{kind:'pon',type:9,from:1}],[],[],[]]};
     let hand=scenario({...options,remaining:1,tailType:20});
     hand=move(hand,0,kind,{type:9});
     assert.equal(remaining(hand),0);assert.equal(Math.floor(hand.lastDraw/4),20);
@@ -44,7 +44,7 @@ test('concealed and added Kongs replace from the last tile and can self-draw',()
 });
 
 test('exposed Kong charges only the discarder and permits a final replacement win',()=>{
-  let hand=scenario({hands:[[9],[9,9,9,0,1,2,18,19,26,26]],remaining:1,tailType:20});
+  let hand=scenario({hands:[[9],[9,9,9,0,1,2,18,19,21,22,23,26,26]],remaining:1,tailType:20});
   hand=discard(hand,0,9);
   hand=move(hand,1,'exposedKong',{type:9});
   assert.equal(hand.actor,1);assert.equal(remaining(hand),0);
@@ -69,7 +69,7 @@ test('a final-discard Pon must discard before a draw; previous payments survive'
 });
 
 test('ordinary last draw can win, no replacement exists at zero, and wildcards cannot Kong',()=>{
-  let hand=scenario({hands:[[9],[0,1,2,18,19,20,21,22,23,26]],remaining:1,headType:26});
+  let hand=scenario({hands:[[9],[0,1,2,12,13,14,18,19,20,21,22,23,26]],remaining:1,headType:26});
   hand=discard(hand,0,9);hand=passPending(hand);
   assert.equal(hand.actor,1);assert.equal(remaining(hand),0);
   hand=move(hand,1,'win');assert.equal(hand.result.winner,1);
@@ -82,15 +82,15 @@ test('ordinary last draw can win, no replacement exists at zero, and wildcards c
 
 test('Jiahei examines all natural decompositions, and opening wins have no last-draw bonus',()=>{
   const copies=Array(27).fill(0);
-  const ids=[0,0,0,1,2,3,3,3,4,5,6].map(type=>4*type+copies[type]++);
+  const ids=[0,0,0,1,2,3,3,3,4,5,6,18,19,20].map(type=>4*type+copies[type]++);
   assert.equal(classifyWin(ids,[],2,ids[4]),'jiahei');
   assert.equal(classifyWin(ids,[],2,null),'black');
-  let opening=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]],wildcard:1,remaining:10});
+  let opening=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]],wildcard:1,remaining:10});
   opening=move(opening,0,'win');assert.equal(opening.result.classification,'black');
 });
 
 test('floating after Pon can complete a self-draw and settles both events in order',()=>{
-  let hand=scenario({hands:[[9],[9,9,0,1,2,18,19,20,26,5]],remaining:5,tailType:26});
+  let hand=scenario({hands:[[9],[9,9,0,1,2,18,19,20,21,22,23,26,5]],remaining:5,tailType:26});
   hand=discard(hand,0,9);hand=move(hand,1,'pon',{type:9});
   assert.equal(hand.canWin,false);assert.equal(hand.payments.length,0);
   const wild=hand.players[1].hand.find(id=>Math.floor(id/4)===5);

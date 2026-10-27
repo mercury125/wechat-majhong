@@ -81,7 +81,7 @@ test('cloud solo setup waits for Ready and broadcasts robot calls and automatic 
   room=await command(service,'solo-human',room.code,{id:'solo-offer',kind:'discard',tile:hand.players[0].hand.find(id=>Math.floor(id/4)===9)});
   assert.ok(room.callNotices.some(notice=>notice.seat===1&&notice.kind==='exposedKong'&&notice.label==='明杠'));
   assert.ok(room.callNotices.every(notice=>notice.kind!=='pass'));
-  stored=await store.getRoom(room.code);hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,26,26]]});
+  stored=await store.getRoom(room.code);hand=scenario({hands:[[0,1,2,9,10,11,18,19,20,21,22,23,26,26]]});
   hand.matchId=stored.match.id;hand.lastDraw=0;hand.wallCode=wallCode(hand,hand.wall);stored.match.hands=[hand];stored.match.scores=hand.scores.slice();stored.callNotices=[];
   await store.updateRoom(stored,stored.revision);
   room=await call(service,'solo-human','controls',{code:room.code,input:{autoWin:true,matchId:hand.matchId,handNo:hand.handNo}});

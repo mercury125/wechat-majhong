@@ -156,9 +156,13 @@ Cloud-function polling uses `action: "view"` with `{ code, after? }` instead of 
 | `kind` | 额外字段 | 说明 |
 | --- | --- | --- |
 | `sit` | `seat` | 坐到空位；未开局时可用 |
+| `addBot` | `seat` | Owner adds a ready bot to an empty seat in an ordinary room; unavailable during an active match |
+| `removeBot` | `seat` | Owner removes a bot before the next match; human seats and private test-room bots cannot be removed |
 | `leave` | 无 | 离开房间；测试房会清空座位并丢弃未完成测试对局 |
 | `ready` | `ready` | 更新准备状态；四人入座并全部准备后自动开始 |
 | `settings` | `handsPerMatch` | 房主在未开局时修改每场局数，修改后所有人取消准备 |
+
+Ordinary rooms support one to three human players with bots filling the other seats. Bots automatically acknowledge, play, continue, and prepare for rematches using the existing single-player policy: Kong before Pon, legal wildcard floating, otherwise a random legal discard, with no self-draw win declaration. Adding the final bot starts the match if all humans have already readied. Bot management uses the same revision checks and command receipts as other room commands. Ownership passes to another human on departure, and the last human leaving clears all bots. Only humans receive replay-history entries for completed mixed matches.
 
 对局命令（均为 `POST` 到同一 commands 路径）：
 
@@ -231,7 +235,7 @@ Provide at least one Boolean control preference. Settings are private and persis
 
 导出有权限访问的牌谱。活动对局中只能导出已结束的小局；比赛结束后仍要求该对局在用户的保留范围内。响应包含对局元数据、已结束小局、命令、事件、支付和最终分数，并删除 `roomCode`，避免泄露房间入口。实时玩家视图中的隐藏信息不会提前出现在该响应中。
 
-牌谱验证完全在客户端本地进行。导出文件本身不证明发牌前曾见过牌山码；只有客户端在对局开始前留存、并与牌谱中的 `wallCode` 一致的本地证据，才能支持“事先承诺”检查。洗牌、校验码和回放格式的细节见 [GOAL.md](../GOAL.md) 和 [fixtures/shuffle-v1.json](fixtures/shuffle-v1.json)。
+牌谱验证完全在客户端本地进行。导出文件本身不证明发牌前曾见过牌山码；只有客户端在对局开始前留存、并与牌谱中的 `wallCode` 一致的本地证据，才能支持“事先承诺”检查。洗牌、校验码和回放格式的细节见 [GOAL.md](../GOAL.md) 和 [fixtures/shuffle-v1-friends-v3.json](fixtures/shuffle-v1-friends-v3.json)。
 
 ## 对局状态流
 

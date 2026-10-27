@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const protocol = require('../miniprogram/lib/shuffle');
-const fixture = require('../docs/fixtures/shuffle-v1.json');
+const fixture = require('../docs/fixtures/shuffle-v1-friends-v3.json');
 
 test('published cross-language shuffle vector and byte encoding', () => {
   assert.equal(Buffer.from(protocol.streamBlock(fixture.seedHex,0)).toString('hex'),fixture.expected.streamBlock0Hex);

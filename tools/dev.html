@@ -751,7 +751,7 @@ function settlementView(hand){
   return html+'</div></section>';
 }
 function handTiles(seat,h){
-  let hand=h?h.players[seat].hand.slice():Array(10).fill(null);
+  let hand=h?h.players[seat].hand.slice():Array(13).fill(null);
   if(seat===room.seat&&h){
     const latest=hand.includes(h.lastDraw)?h.lastDraw:null;
     hand=layout.arrangeHand(hand,h.wildcardType,latest,sortEnabled,manualOrder);
@@ -768,6 +768,11 @@ function decisionButtons(h){
     return '<button class="decision-button '+view.variant+'" data-action="'+escape(JSON.stringify(a))+'" aria-label="'+name+'" '+(actionPending?'disabled':'')+'><span class="decision-plate" aria-hidden="true"></span><span class="decision-preview" aria-hidden="true">'+preview+'</span><span class="decision-glyph" aria-hidden="true">'+view.glyph+'</span><span class="decision-note">'+name+'</span></button>';
   }).join('');
 }
+function botControls(){
+  if(!room||room.testMode||room.ownerId!==user?.id||room.match?.status==='active')return '';
+  const buttons=room.seats.map((player,seat)=>!player||player.bot?'<button data-bot-kind="'+(player?'removeBot':'addBot')+'" data-bot-seat="'+seat+'" '+(actionPending?'disabled':'')+'>'+ (seat+1)+' 号位 · '+(player?'移除机器人':'添加机器人')+'</button>':'').join('');
+  return '<div class="form-row">'+buttons+'</div>';
+}
 function tableContents(h){
   let html=Array.from({length:4},(_,i)=>seatView(i,h)).join(''),ponds='',racks='',meldRacks='';
   if(h)html+='<div class="board-info" aria-label="朝天与癞子"><div><span class="label">朝天</span>'+tiles([h.indicatorId],null,-1)+'</div><div><span class="label">癞子</span>'+tiles([h.wildcardType*4],h.wildcardType,-1)+'</div></div>';
@@ -780,7 +785,7 @@ function tableContents(h){
   }
   const scores=h?['bottom','right','top','left'].map((position,offset)=>{const seat=(room.seat+offset)%4;return '<span class="center-score '+position+(h.actor===seat&&h.phase==='own'?' acting':'')+'" aria-label="'+escape(room.seats[seat]?.name||'牌友')+'，'+h.scores[seat]/2+' 分">'+h.scores[seat]/2+'<small>分</small></span>';}).join(''):'';
   html+='<div class="table-camera"><div class="table-world"><div class="table-surface" aria-hidden="true"></div>'+racks+meldRacks+'<div class="pond-ring">'+ponds+'<div class="center-square">'+scores+'<div class="center-core"><strong class="hand-progress">'+(h?'第 '+h.handNo+' 局':'好友场')+'</strong><span class="hand-progress-caption">'+(h?'共 '+room.match.settings.handsPerMatch+' 局':'等你落座')+'</span><span class="center-remaining">'+(h?'余 '+h.remaining:'四人麻将')+'</span><span class="center-status">'+(h?phases[h.phase]+(h.phase==='commit'?' '+h.acknowledgements.filter(Boolean).length+'/4':''):'准备后自动开始')+'</span></div></div></div></div></div>';
-  if(!h)html+='<div class="ready-panel">'+(room.ownerId===user?.id?'<input class="room-hands" data-room-hands type="number" min="1" value="'+room.settings.handsPerMatch+'" aria-label="每场局数"><button data-room-settings>设置局数</button>':'')+'<button data-kind="ready" class="primary">'+(room.ready[room.seat]?'取消准备':'准备')+'</button>'+(room.testMode?'':'<button data-share>邀请好友</button>')+'<span class="muted">'+room.seats.filter(Boolean).length+' / 4 人入座 · '+room.ready.filter(Boolean).length+' 人准备 · 四人准备好后自动开始</span></div>';
+  if(!h)html+='<div class="ready-panel">'+(room.ownerId===user?.id?'<input class="room-hands" data-room-hands type="number" min="1" value="'+room.settings.handsPerMatch+'" aria-label="每场局数"><button data-room-settings>设置局数</button>':'')+'<button data-kind="ready" class="primary">'+(room.ready[room.seat]?'取消准备':'准备')+'</button>'+(room.testMode?'':'<button data-share>邀请好友</button>')+botControls()+'<span class="muted">'+room.seats.filter(Boolean).length+' / 4 人入座 · '+room.ready.filter(Boolean).length+' 人准备 · 四人准备好后自动开始</span></div>';
   if(h){
     const controls=room.controls||{};
     html+='<div class="action-tray mahjong-actions"><button data-sort class="'+(sortEnabled?'active':'')+'" aria-label="自动理牌" title="自动理牌" aria-pressed="'+sortEnabled+'" '+(actionPending?'disabled':'')+'>理</button>'+[['autoWin','和','自动胡牌'],['skipCalls','鸣','免鸣：不吃碰杠'],['autoCut','切','自动摸切']].map(([key,label,title])=>'<button data-control="'+key+'" class="'+(controls[key]?'active':'')+'" aria-label="'+escape(title)+'" title="'+title+'" aria-pressed="'+!!controls[key]+'" '+(actionPending||h.phase==='finished'?'disabled':'')+'>'+label+'</button>').join('')+'</div>';
@@ -809,6 +814,7 @@ function render(){
       const title=isSettings?'牌桌设置':panel==='interaction'?'与'+(room.seats[interactionTarget]?.name||'牌友')+'互动':panel==='emotes'?'选择表情包':'选择角色牌背';
       let content=panel==='interaction'?interactionPanel(false):panel==='emotes'?emotePanel(c):'<div class="character-gallery">'+characterChoices()+'</div>';
       if(isSettings)content='<div class="settings-options"><div class="row"><button data-panel="characters">更换牌背</button><button data-panel="emotes">角色表情</button></div><button data-sort aria-pressed="'+sortEnabled+'">自动理牌：'+(sortEnabled?'开启':'关闭')+'</button>'+(h?'<details><summary>牌山校验码</summary><p class="hash">'+h.wallCode+'</p></details><details><summary>本局收支</summary><div class="payments">'+(h.payments.map(p=>escape(room.match.seats[p.payer].name)+' → '+escape(room.match.seats[p.recipient].name)+'：'+p.amount/2+' 分 · '+(labels[p.kind]||'结算')).join('<br>')||'本局暂无收支')+'</div></details>':'')+'<details><summary>操作说明</summary><p>点牌选中，再点同一张牌打出。“理”自动理牌，“和”自动胡牌，“鸣”免鸣（不吃碰杠），“切”自动摸切；同时开启“和、切”时先胡牌。碰杠或过牌、手动自摸使用另行出现的选择。起手和碰后没有新摸牌时仍需手动出牌；摸到癞子时依法飘牌，不能飘时等待手动切普通牌。关闭“理”后可拖动排序。</p></details><span class="muted">房间 '+room.code+' · 每场 '+room.settings.handsPerMatch+' 局</span></div>';
+      if(isSettings)content+=botControls();
       if(isSettings)content+=room.testMode?'<button data-exit-test>结束测试</button><p class="muted">机器人有杠先杠、可碰就碰，其余随机出牌；摸到癞子时按规则飘，不能飘时随机打出普通牌。机器人不自动胡牌。结束测试会放弃未完成的本场进度。</p>':'<button data-share>邀请好友 · 复制链接</button>';
       html+='<section class="popover" role="region" aria-label="'+escape(title)+'"><div class="intro"><div><h3>'+escape(title)+'</h3><span class="muted">'+(isSettings?'好友场 · 仅限自摸':panel==='interaction'?'每人每局 '+cosmetics.interactionLimit+' 次 · 两种道具共用':panel==='emotes'?(emotePack==='interaction'?'每人每局 '+cosmetics.interactionLimit+' 次 · 两种道具共用':'同桌可见 · 显示三秒 · 每三秒可发送一次'):'牌背与头像随角色一起更换')+'</span></div><button data-panel="" aria-label="关闭面板">×</button></div>'+content+'</section>';
     }
@@ -829,6 +835,7 @@ function render(){
   document.querySelectorAll('[data-interaction]').forEach(button=>button.onclick=()=>run(()=>sendInteraction(button.dataset.interaction)));
   document.querySelectorAll('[data-emote]').forEach(button=>button.onclick=()=>run(()=>sendEmote(button.dataset.emote)));
   document.querySelectorAll('[data-kind]').forEach(button=>button.onclick=()=>run(()=>send({kind:button.dataset.kind,...(button.dataset.kind==='ready'?{ready:!room.ready[room.seat]}:{})})));
+  document.querySelectorAll('[data-bot-kind]').forEach(button=>button.onclick=()=>run(()=>send({kind:button.dataset.botKind,seat:Number(button.dataset.botSeat)})));
   document.querySelectorAll('[data-room-settings]').forEach(button=>button.onclick=()=>run(()=>send({kind:'settings',handsPerMatch:Number(document.querySelector('[data-room-hands]').value)})));
   bindDecisions();bindHand();
   document.querySelectorAll('[data-sort]').forEach(button=>button.onclick=toggleSort);

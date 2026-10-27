@@ -1,6 +1,7 @@
 'use strict';
 
 const { typeOf } = require('./tiles');
+const { RULES_VERSION, SUPPORTED_RULES } = require('./shuffle');
 
 function sets(counts, needed) {
   if (needed === 0) return counts.every(n => n === 0);
@@ -32,8 +33,9 @@ function natural(counts, needed) {
   return false;
 }
 
-function classifyWin(hand, melds, wildcard, lastDraw) {
-  const needed = 3 - melds.length;
+function classifyWin(hand, melds, wildcard, lastDraw, rulesVersion = RULES_VERSION) {
+  if (!SUPPORTED_RULES.includes(rulesVersion)) return null;
+  const needed = (rulesVersion === 'friends-v2' ? 3 : 4) - melds.length;
   if (needed < 0 || hand.length !== 3 * needed + 2) return null;
   const counts = Array(27).fill(0);
   hand.forEach(id => counts[typeOf(id)]++);

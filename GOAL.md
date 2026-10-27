@@ -6,7 +6,7 @@
 
 ## 要求
 
-实现以下朋友局麻将规则, 使用 108 张牌, 只能自摸, 不允许吃, 允许碰杠, 胡牌结构为三副面子加一对雀头, 支持朝天, 癞子和飘癞子.
+实现以下朋友局麻将规则, 使用 108 张牌, 只能自摸, 不允许吃, 允许碰杠, 胡牌结构为四副面子加一对雀头, 支持朝天, 癞子和飘癞子.
 
 ### 1. 人数, 用牌与术语
 
@@ -22,7 +22,7 @@
 - 每局洗牌后, 翻开牌墙最后一张牌作为指示牌, 称为"朝天". 朝天公开展示, 本局不参与发牌, 摸牌, 碰杠或胡牌.
 - 癞子由朝天的牌面确定: 保持花色不变, 数字加 1, 9 后回到 1. 例如朝天为 4 饼, 则全部 4 张 5 饼都是癞子; 朝天为 9 饼, 则全部 4 张 1 饼都是癞子. 这里的"下一张"指数字顺序, 不是朝天旁边那张实体牌.
 - 首局随机选庄家; 以后由上一局胡牌者坐庄, 流局时原庄家继续坐庄, 无连庄加分.
-- 庄家起手 11 张, 其他玩家各 10 张, 由庄家先出牌. 发牌张数与"三副面子加一对雀头"的胡牌结构保持一致.
+- 庄家起手 14 张, 其他玩家各 13 张, 由庄家先出牌. 发牌张数与"四副面子加一对雀头"的胡牌结构保持一致.
 - 庄家起手满足胡牌条件时可直接胡牌, 按自摸结算.
 
 ### 3. 回合与出牌
@@ -55,8 +55,8 @@
 ### 6. 胡牌判定
 
 - 只能自摸胡牌, 不存在点炮胡和一炮多响. 自摸包括正常摸牌, 杠后补牌和飘癞子补牌; 庄家起手胡按第 2 节处理.
-- 胡牌结构必须为"一对雀头 + 三副面子". 每副面子只能是顺子, 刻子或杠; 已经碰, 杠的副露占用对应的面子数量, 不能再次用于其他组合.
-- 无杠时, 胡牌的实际牌数为 11 张; 有杠时, 每个杠额外增加 1 张实际牌. 例如一副杠, 两副顺子加一对雀头共 12 张, 仍是合法结构.
+- 胡牌结构必须为"一对雀头 + 四副面子". 每副面子只能是顺子, 刻子或杠; 已经碰, 杠的副露占用对应的面子数量, 不能再次用于其他组合.
+- 无杠时, 胡牌的实际牌数为 14 张; 有杠时, 每个杠额外增加 1 张实际牌. 例如一副杠, 三副顺子加一对雀头共 15 张, 仍是合法结构.
 - 癞子数量必须满足第 5 节最多 1 张的限制. 飘出的癞子, 弃牌和朝天都不计入自己的胡牌结构或手牌癞子数量, 但已飘癞子数参与计分.
 - 不另设起胡番数, 不增加七对, 十三幺等特殊牌型. 胡牌按第 8 节区分黑摸和带癞自摸, 黑摸满足夹黑条件时额外翻 1 倍; 清一色, 天胡, 杠上开花等不额外加分.
 
@@ -132,7 +132,7 @@ The target is a WeChat Mini Program for four friends playing the rules above. Pr
 
 - A **hand** is one deal ending in self-draw or an exhausted wall. A **match** contains a configured number of completed hands, default **8**. A **room** holds four fixed seats for the active match.
 - The room owner creates a room; friends join through a room code or WeChat invitation, choose an empty seat, and mark themselves ready. The match starts automatically as soon as all four seats are occupied and all four players are ready; there is no separate owner start action. Bind each seat to its authenticated player; a room code alone does not authorize acting as another player.
-- The owner may set `handsPerMatch` before starting, using a positive integer within the hand-number range defined below. Freeze the setting, seat assignments, and `rulesVersion = friends-v2` for the match. `friends-v1` is no longer supported.
+- The owner may set `handsPerMatch` before starting, using a positive integer within the hand-number range defined below. Freeze the setting, seat assignments, and `rulesVersion = friends-v3` for new matches. Existing `friends-v2` matches and replays retain their 11/10 deal and three-meld win structure; `friends-v1` is no longer supported.
 - A win or draw counts as one completed hand. Dealer retention does not add extra hands: an 8-hand match ends after hand 8 even if the dealer wins. Apply the existing dealer rule between hands; choose a new random first dealer for a new match.
 - Match scores start at zero and accumulate every settled payment, including payments in drawn hands. Allow negative scores. Show hand deltas and match totals separately; the four-player total remains zero.
 - Between hands, show the result and require all four players to continue. Reconnection restores the same seat and authoritative state, including an unresolved response window. Friend rooms have no forced move timer or bot substitution; a disconnected player can therefore pause progress until returning. Separate single-player test rooms use three robots.
@@ -169,12 +169,12 @@ Use the following byte conventions throughout: `||` concatenates bytes; `U32BE(x
 2. Initialize `W = [0, 1, ..., 107]`. Starting at counter `c = 0`, generate blocks `HMAC-SHA256(key=S, message=UTF8("wechat-mahjong/shuffle/v1\0") || U32BE(c))`, incrementing `c` for each block. Here `\0` means a single NUL byte. Read each block as eight unsigned 32-bit big-endian values in order; consume values continuously across shuffle steps.
 3. For `i` from 107 down to 1, set `m = i + 1` and `L = floor(2^32 / m) * m`. Consume the next value `x`; reject it and consume another while `x >= L`. Set `j = x % m`, then swap `W[i]` and `W[j]`. This avoids modulo bias. Never sort tiles by random keys or reshuffle in response to gameplay.
 4. Preserve `W` as the complete original wall. Set aside `W[107]` as Chaotian (朝天), derive the wildcard type by advancing its rank within its suit, and initialize the usable-wall pointers to `head = 0`, `tail = 106`, inclusive.
-5. Seats are fixed indices 0–3 in counterclockwise order. Starting at the dealer, deal one tile at a time from the head to each seat for 10 passes; give the next head tile to the dealer. Thus the dealer has 11 tiles, the others 10, `head = 41`, and **66 playable tiles remain**. The dealer begins in the own-action phase without another draw.
+5. Seats are fixed indices 0–3 in counterclockwise order. Starting at the dealer, deal one tile at a time from the head to each seat for 13 passes; give the next head tile to the dealer. Thus the dealer has 14 tiles, the others 13, `head = 53`, and **54 playable tiles remain**. The dealer begins in the own-action phase without another draw.
 6. Normal draws consume `W[head]` and increment `head`. Every Kong/float replacement consumes `W[tail]` and decrements `tail`. The remaining count is `max(0, tail - head + 1)`. Indicator and previously consumed tiles never return to the wall. For floating, check that this count is greater than 4 **before** removing the wildcard.
 
 ### Wall code: commit before dealing, reveal after the hand
 
-The **wall code** is a commitment to the complete ordered wall and its context. Define `matchId` as a unique UTF-8 string, `handNo` as an integer from 1 to $2^{32}-1$, `dealerSeat` as 0–3, `rulesVersion` as `friends-v2`, and `shuffleVersion` as `fy-hmac-sha256-v1`.
+The **wall code** is a commitment to the complete ordered wall and its context. Define `matchId` as a unique UTF-8 string, `handNo` as an integer from 1 to $2^{32}-1$, `dealerSeat` as 0–3, `rulesVersion` as `friends-v3`, and `shuffleVersion` as `fy-hmac-sha256-v1`.
 
 ```text
 context = LP(matchId) || U32BE(handNo) || U8(dealerSeat)
@@ -192,7 +192,7 @@ wallCode = "sha256:" + lowercase_hex(SHA256(
 - Verification regenerates `W` from the seed, checks the permutation, recomputes its code, and compares it to the pre-deal code retained by the client. It then checks indicator selection, dealing, all draws/replacements, and tile conservation against the replay.
 - A matching pre-deal commitment establishes consistency with that committed wall; it does not establish that the server never selected a favorable seed beforehand, read hidden tiles, colluded, or withheld a hand. A file containing only a self-consistent wall and hash also cannot prove when that hash was published. Keep these limits visible in verification details.
 
-The fixed [shuffle and wall-code test vector](docs/fixtures/shuffle-v1.json) specifies seed, first stream block, context, complete wall, code, initial hands, and remaining-wall boundaries under the only supported rules version. It is public test data and must never be used as a production seed.
+The fixed [shuffle and wall-code test vector](docs/fixtures/shuffle-v1-friends-v3.json) specifies seed, first stream block, context, complete wall, code, initial hands, and remaining-wall boundaries under the current rules version; the original friends-v2 vector is retained for compatibility checks. It is public test data and must never be used as a production seed.
 
 ### Table layout and interactions
 
@@ -263,7 +263,7 @@ Log dealing, normal/replacement draws, ordinary discards, Pass decisions, each K
 These are implementation gates, not claims that the game has already been built.
 
 1. **Rules and scores:** cover all three suits, rank-9 wildcard wraparound, ordinary/wildcard/natural-use black wins, multiple decompositions, true and false Jiahei, opening wins, meld-aware three-set-plus-pair validation, two-wildcard rejection, and forbidden Chi/discard-win/wildcard calls. Reproduce every numeric example in Section 8, including 1/1/2-point Kong bases, unequal payer counts, consecutive floats, replacement-draw wins, whole-point Kong payments, and zero-sum totals.
-2. **Wall boundaries:** verify the indicator exclusion, 11/10/10/10 deal and 66 remaining tiles, head/tail consumption, all Kong kinds, float allowed at 5 remaining but rejected at 4, Kong rejected at 0, last-tile wins, final-discard Pon handling, and draw settlement preserving earlier payments. Assert 108-tile conservation after each accepted action.
+2. **Wall boundaries:** verify the indicator exclusion, 14/13/13/13 deal and 54 remaining tiles, head/tail consumption, all Kong kinds, float allowed at 5 remaining but rejected at 4, Kong rejected at 0, last-tile wins, final-discard Pon handling, and draw settlement preserving earlier payments. Assert 108-tile conservation after each accepted action.
 3. **Reproducibility:** match the fixed vector byte for byte in both backend and client verifier, including the first HMAC block, wall code, dealing, and nonzero dealer seat. Exercise rejection sampling with a forced rejected value. Changing one wall position, seed, hand number, dealer, or version must fail the appropriate check. Include malformed/unsupported inputs and missing pre-deal evidence.
 4. **Four-player flow:** four authenticated clients can create/join/ready, complete a hand and a configured match, retain the correct dealer, reconnect during own actions and discard responses, and recover a server restart without tile or payment duplication. Duplicate/stale commands and unauthorized seat actions are rejected. Inspect live traffic to confirm hidden information is absent before hand completion.
 5. **Replay lifecycle:** replay every action and payment to the recorded final state, seek backward/forward consistently, export/reopen a completed replay, verify a hand before the match finishes, retain 1000 completed matches by default, and exercise adjustable limits. Test pruning with a small limit, active matches, shared records with different participant limits, and unauthorized replay access.

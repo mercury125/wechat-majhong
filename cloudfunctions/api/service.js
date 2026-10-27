@@ -2,7 +2,7 @@
 
 const { randomBytes, randomUUID } = require('node:crypto');
 const { createHand, act, publicHand, clone, isActionId } = require('./shared/engine');
-const { RULES_VERSION, SHUFFLE_VERSION } = require('./shared/shuffle');
+const { RULES_VERSION, SUPPORTED_RULES, SHUFFLE_VERSION } = require('./shared/shuffle');
 const { canonical } = require('./shared/replay');
 const cosmetics = require('./shared/cosmetics');
 const { botAction, automaticAction } = require('./shared/bots');
@@ -21,7 +21,7 @@ function nameValue(value) {
 }
 
 const COMMAND_KEYS = ['id','kind','tile','type','code','seat','handsPerMatch','ready','matchId','handNo'];
-const ROOM_COMMANDS = new Set(['sit','leave','ready','settings']);
+const ROOM_COMMANDS = new Set(['sit','leave','ready','settings','addBot','removeBot']);
 const RECEIPT_LIMIT = 512;
 const CALL_KINDS = new Set(['pon','exposedKong','concealedKong','addedKong']);
 const CALL_NOTICE_LABELS = { pon:'碰', exposedKong:'明杠', concealedKong:'暗杠', addedKong:'补杠', win:'胡' };
@@ -191,16 +191,25 @@ class CloudService {
       bots: [],
     };
     if (room.testMode) {
-      for (let seat = 1; seat < 4; seat++) {
-        const id = randomUUID();
-        await this.store.putUser({ id, openid:null, name:'机器人' + '一二三'[seat - 1] + '号', historyLimit:1000, lastSeen:Date.now(), bot:true });
-        room.seats[seat] = id;
-        room.bots.push(id);
-      }
+      for (let seat = 1; seat < 4; seat++) await this.addBot(room, seat);
       await this.advanceAutomatic(room, null);
     }
     await this.store.createRoom(room);
     return this.view(room, user);
+  }
+
+  async addBot(room, seat) {
+    room.bots = room.bots || [];
+    let id = room.bots.find(id => !room.seats.includes(id));
+    if (!id) {
+      id = randomUUID();
+      await this.store.putUser({ id, openid:null, name:'机器人' + '一二三'[room.bots.length] + '号', historyLimit:1000, lastSeen:Date.now(), bot:true });
+      room.bots.push(id);
+    }
+    room.seats[seat] = id;
+    room.ready[seat] = true;
+    if (room.characters) room.characters[seat] = cosmetics.defaults[seat];
+    if (room.emotes) room.emotes[seat] = null;
   }
 
   receipt(room, userId, id) {
@@ -221,9 +230,7 @@ class CloudService {
 
   async ensureArchived(room) {
     if (!room.match || room.match.status !== 'complete') return;
-    const participants = room.testMode
-      ? room.match.seats.filter(player => player.playerId === room.ownerId)
-      : room.match.seats;
+    const participants = room.match.seats.filter(player => !player.bot && !room.bots?.includes(player.playerId));
     await this.store.archiveMatch(room.match, participants);
   }
 
@@ -242,7 +249,7 @@ class CloudService {
       settings: clone(room.settings),
       rulesVersion: RULES_VERSION,
       shuffleVersion: SHUFFLE_VERSION,
-      seats: room.seats.map(playerId => ({ playerId, name:names.get(playerId) || '牌友' })),
+      seats: room.seats.map(playerId => ({ playerId, name:names.get(playerId) || '牌友', bot:!!room.bots?.includes(playerId) })),
       status: 'active',
       startedAt: at,
       endedAt: null,
@@ -258,7 +265,23 @@ class CloudService {
     return match;
   }
 
-  roomCommand(room, user, input, seat) {
+  async roomCommand(room, user, input, seat) {
+    if (input.kind === 'addBot' || input.kind === 'removeBot') {
+      requireTrue(!room.testMode && room.ownerId === user.id, 403, '只有普通房间的房主可以添加或移除机器人');
+      const target = input.seat;
+      requireTrue(Number.isInteger(target) && target >= 0 && target < 4, 400, '请选择有效座位');
+      if (input.kind === 'addBot') {
+        requireTrue(room.seats[target] === null, 409, '该座位已有人，或房间已满');
+        await this.addBot(room, target);
+        return room.seats.every(Boolean) && room.ready.every(Boolean) ? this.startMatch(room) : null;
+      }
+      requireTrue(room.seats[target] && room.bots?.includes(room.seats[target]), 409, '该座位不是机器人');
+      room.seats[target] = null;
+      room.ready[target] = false;
+      if (room.characters) room.characters[target] = cosmetics.defaults[target];
+      if (room.emotes) room.emotes[target] = null;
+      return null;
+    }
     if (input.kind === 'sit') {
       requireTrue(Number.isInteger(input.seat) && input.seat >= 0 && input.seat < 4 && room.seats[input.seat] === null, 409, '该座位已有人，或房间已满');
       room.seats[seat] = null;
@@ -274,7 +297,14 @@ class CloudService {
       room.ready[seat] = false;
       if (room.characters) room.characters[seat] = cosmetics.defaults[seat];
       if (room.emotes) room.emotes[seat] = null;
-      if (room.ownerId === user.id) room.ownerId = room.seats.find(Boolean) || null;
+      if (room.ownerId === user.id) {
+        room.ownerId = room.seats.find(id => id && !room.bots?.includes(id)) || null;
+        if (!room.ownerId) {
+          room.seats = [null, null, null, null];
+          room.ready = [false, false, false, false];
+          room.bots = [];
+        }
+      }
       return null;
     }
     if (input.kind === 'ready') {
@@ -296,7 +326,7 @@ class CloudService {
 
   gameCommand(room, match, seat, input) {
     const hand = match.hands[match.hands.length - 1];
-    requireTrue(match.rulesVersion === RULES_VERSION && hand.rulesVersion === RULES_VERSION, 409, '此对局使用了已停止支持的规则版本');
+    requireTrue(SUPPORTED_RULES.includes(match.rulesVersion) && hand.rulesVersion === match.rulesVersion, 409, '此对局使用了已停止支持的规则版本');
     requireTrue(input.matchId === match.id && input.handNo === hand.handNo, 409, '操作指向已过期的对局或小局');
     if (input.kind === 'continue') {
       requireTrue(hand.phase === 'finished', 409, '本局尚未结束');

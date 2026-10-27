@@ -12,7 +12,7 @@ const {verifyMatch}=require('../miniprogram/lib/replay');
 const {wallCode}=require('../miniprogram/lib/shuffle');
 const {scenario}=require('./scenarios');
 let serial=0;
-const plain=[0,1,2,9,10,11,18,19,20,26,26];
+const plain=[0,1,2,9,10,11,18,19,20,21,22,23,26,26];
 
 function solo(seed=0,handsPerMatch=1,filename=':memory:'){
   const store=new Store(filename);let next=seed;
@@ -54,8 +54,8 @@ test('robots always prefer a Kong over Pon, and use all three Kong kinds',()=>{
     hand=act(hand,0,{id:'offer',kind:'discard',tile:hand.players[0].hand.find(id=>Math.floor(id/4)===9)});
     assert.equal(botAction(hand,1).kind,copies===3?'exposedKong':'pon');
   }
-  assert.equal(botAction(scenario({hands:[[9,9,9,9,0,1,2,18,19,26,26]]}),0).kind,'concealedKong');
-  assert.equal(botAction(scenario({hands:[[9,0,1,2,18,19,26,26]],melds:[[{kind:'pon',type:9,from:1}]]}),0).kind,'addedKong');
+  assert.equal(botAction(scenario({hands:[[9,9,9,9,0,1,2,18,19,21,22,23,26,26]]}),0).kind,'concealedKong');
+  assert.equal(botAction(scenario({hands:[[9,0,1,2,18,19,21,22,23,26,26]],melds:[[{kind:'pon',type:9,from:1}]]}),0).kind,'addedKong');
 });
 
 test('robots can randomly choose every legal hand tile, including the draw and physical tile zero',t=>{
@@ -69,7 +69,7 @@ test('robots can randomly choose every legal hand tile, including the draw and p
 });
 
 test('robots float drawn wildcards legally and randomly hand-cut after Pon or an unfloatable wildcard',()=>{
-  const wild=[5,0,1,2,9,10,11,18,19,26,26];
+  const wild=[5,0,1,2,9,10,11,18,19,21,22,23,26,26];
   let hand=scenario({hands:[wild],remaining:5});hand.lastDraw=hand.players[0].hand.find(id=>Math.floor(id/4)===5);
   assert.equal(botAction(hand,0).kind,'float');assert.equal(botAction(hand,0).tile,hand.lastDraw);
   hand=scenario({hands:[wild],remaining:4});hand.lastDraw=hand.players[0].hand.find(id=>Math.floor(id/4)===5);
