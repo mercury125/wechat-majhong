@@ -1,0 +1,187 @@
+{
+  "repository": "https://github.com/FluffyStuff/riichi-mahjong-tiles",
+  "commit": "26e127ba2117f45cdce5ea0225748cc0cfad3169",
+  "license": "CC0-1.0",
+  "files": [
+    {
+      "file": "Back.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Back.png",
+      "bytes": 16878,
+      "sha256": "d0395ed9ee837f3e080ccc5ca00fa5767b53a3d0f193995947fd755f07ee85b8"
+    },
+    {
+      "file": "Front.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Front.png",
+      "bytes": 14095,
+      "sha256": "05a82d02d34ecd9fe746e24827a231476a1f41eb4fb2447047a08acb426bde93"
+    },
+    {
+      "file": "LICENSE.upstream.md",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/LICENSE.md",
+      "bytes": 114,
+      "sha256": "17996c5e7de4cbbc71d0e2db73cb63b0590632cc75be9ab2d885edfae5b9f737"
+    },
+    {
+      "file": "Man1.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man1.png",
+      "bytes": 30331,
+      "sha256": "282cf23e82795804e2b7d37432b8735f8b5c2abb8e80e8d43b3142fda4da7840"
+    },
+    {
+      "file": "Man2.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man2.png",
+      "bytes": 32403,
+      "sha256": "d0623b0c305d310e3ce008dfb127ac73fab9af7805c39adc488373140d477dff"
+    },
+    {
+      "file": "Man3.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man3.png",
+      "bytes": 34577,
+      "sha256": "77fea9a0df875f660e7a51b6500a0583fa9358e18154e119ce54832390264f63"
+    },
+    {
+      "file": "Man4.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man4.png",
+      "bytes": 36365,
+      "sha256": "783a3e814d4475fb922c0092fa58fb39f2aebee99a333b3e39c9a0c07ee1f29f"
+    },
+    {
+      "file": "Man5.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man5.png",
+      "bytes": 37537,
+      "sha256": "13f663365b140e4d7ef0fdb4a08b76c925f66c21040b7cfea4867072c2b46fbe"
+    },
+    {
+      "file": "Man6.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man6.png",
+      "bytes": 35517,
+      "sha256": "0a23bc1ba15862e9d01834d71b832c0dc4344b8abe73ebea70a8eef4c1a618f9"
+    },
+    {
+      "file": "Man7.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man7.png",
+      "bytes": 33880,
+      "sha256": "98030c78beff76cbecd7a4644fc61ac24efc8bf57aa57452ed18ad878ec40f2a"
+    },
+    {
+      "file": "Man8.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man8.png",
+      "bytes": 32923,
+      "sha256": "e7ea5779a56f7ecb7dd02227d43732ed47d99d89a5a06bd09009720cea548a42"
+    },
+    {
+      "file": "Man9.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Man9.png",
+      "bytes": 35609,
+      "sha256": "f35db283b97815793e3601d81deb907ccf2ad4df972bbcb99e31d1dd934c6e5d"
+    },
+    {
+      "file": "Pin1.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin1.png",
+      "bytes": 112528,
+      "sha256": "d1b0cbb3344e07b2fb8d0acda3c91e8d5d3fa3b081dbf77c58ee384f560ff225"
+    },
+    {
+      "file": "Pin2.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin2.png",
+      "bytes": 68558,
+      "sha256": "406355c874e97f184549886acc110c514d00a22d8fd9ab8d9e42b4204472b640"
+    },
+    {
+      "file": "Pin3.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin3.png",
+      "bytes": 51648,
+      "sha256": "744c86b36fee47eb29c9532957cd3155b52d4ee47a42fb943d95fb012561d723"
+    },
+    {
+      "file": "Pin4.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin4.png",
+      "bytes": 63795,
+      "sha256": "8e5d0c2c4726ab0fbe3052ff4122e3eb8738c168da91e8262418832b7ed1e1fc"
+    },
+    {
+      "file": "Pin5.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin5.png",
+      "bytes": 79485,
+      "sha256": "f8de648dbec4504c7f5da239fcdb1e9a0e3234e37471aa1dddaf7253b295c36f"
+    },
+    {
+      "file": "Pin6.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin6.png",
+      "bytes": 84368,
+      "sha256": "18a765bfd8ed0df17ae330fc6e83d21701be31336a8b972351b3591c2eeb836e"
+    },
+    {
+      "file": "Pin7.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin7.png",
+      "bytes": 99164,
+      "sha256": "c97d16e6f3c823a393696947f4a85e18a23740b82a0537367d03ec92f6854bba"
+    },
+    {
+      "file": "Pin8.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin8.png",
+      "bytes": 109001,
+      "sha256": "784091a45f498e0cdc3e54ab34ca1484bcf8328eb5f569a2439f4aedeb513ac7"
+    },
+    {
+      "file": "Pin9.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Pin9.png",
+      "bytes": 117843,
+      "sha256": "421f0550817c09c5188772ed82cea1a82b956c14458bfba74bcd29720d04048f"
+    },
+    {
+      "file": "Sou1.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou1.png",
+      "bytes": 91506,
+      "sha256": "d0d30dbc1e337c915bb4206540950e606ce572fa40f1af5326afb0aa83dc41e3"
+    },
+    {
+      "file": "Sou2.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou2.png",
+      "bytes": 21414,
+      "sha256": "ee00b13b8d73c09aad2f57171cccf159dcfa0a66df19be99c3897c880356e68d"
+    },
+    {
+      "file": "Sou3.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou3.png",
+      "bytes": 28924,
+      "sha256": "87998c5b6433d94adbd8e218538b0d76893dbf4f696149662ef176f7f1492aec"
+    },
+    {
+      "file": "Sou4.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou4.png",
+      "bytes": 37025,
+      "sha256": "889c69b2679d1af0a47a18dff039caf093e8bbb83b7ac58d6b71d2f0af48b003"
+    },
+    {
+      "file": "Sou5.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou5.png",
+      "bytes": 45175,
+      "sha256": "8bd24f24b4ca39dc2532792b7207dc3d80ee294b19cae2b390ec9ee8f03162a2"
+    },
+    {
+      "file": "Sou6.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou6.png",
+      "bytes": 50221,
+      "sha256": "bb2b619739d54eaa41d1e86e2e6657050a9a37e31c1b1a5701d763320f1e50a7"
+    },
+    {
+      "file": "Sou7.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou7.png",
+      "bytes": 41811,
+      "sha256": "48a74a5cb5fa480904ddd4d02911dcf84bef903b2b72ecee7b95c03d473d4b9b"
+    },
+    {
+      "file": "Sou8.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou8.png",
+      "bytes": 57997,
+      "sha256": "68d4fc49ab176377fe123eea7dad95ee2814f6d07692d90cc561489abc86a974"
+    },
+    {
+      "file": "Sou9.png",
+      "source": "https://raw.githubusercontent.com/FluffyStuff/riichi-mahjong-tiles/26e127ba2117f45cdce5ea0225748cc0cfad3169/Export/Regular/Sou9.png",
+      "bytes": 53557,
+      "sha256": "9514cb7c94b3393345459452959b8f572334d5a9ccce4eaa8d2fa1925db81c79"
+    }
+  ]
+}

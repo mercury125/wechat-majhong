@@ -1,0 +1,18 @@
+.verify-screen{padding-top:8px}
+.header{height:36px;margin-bottom:8px}
+.verify-columns{display:flex;gap:12px}
+.input-column{width:52%;gap:7px}
+.json-input{width:100%;height:calc(100vh - 180px);min-height:80px;font-family:monospace;font-size:10px;white-space:pre-wrap}
+.input-column .row{gap:5px;flex-wrap:wrap}
+.input-column button{padding:0 10px;font-size:11px}
+.output-column{flex:1;min-width:0;padding:10px}
+.report-scroll{height:calc(100vh - 108px)}
+.report-status{display:block;font-size:20px;font-weight:600;margin-bottom:12px}
+.pass,.passed{color:#b5e2bb}
+.fail,.failed{color:#ffb9a5}
+.unknown,.unverified{color:#f2cd70}
+.check{padding:7px 0;border-bottom:1px solid #416254}
+.check-name{display:block;font-size:12px}
+.check-detail{display:block;word-break:break-all;font-size:11px;margin-top:4px}
+.hash{display:block;font-family:monospace;word-break:break-all;font-size:10px;margin:5px 0 10px}
+

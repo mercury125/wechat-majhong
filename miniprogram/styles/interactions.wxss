@@ -1,0 +1,32 @@
+.interaction-effect{position:fixed;width:0;height:0;z-index:35;pointer-events:none}
+.bucket-icon{position:relative;display:block;width:56px;height:56px}
+.bucket-handle{position:absolute;left:8px;top:0;width:40px;height:32px;border:3px solid #c5d5df;border-bottom:0;border-radius:22px 22px 0 0;box-shadow:inset 0 0 0 1px #566c7d}
+.bucket-body{position:absolute;left:5px;top:17px;width:46px;height:36px;border:3px solid #526d84;border-top-color:#d7e9ed;border-radius:3px 3px 12px 12px;background:linear-gradient(90deg,#7497ad,#d3e3ea 40%,#86a7ba 72%,#526d84);box-shadow:0 3px 5px #082e4455}
+.bucket-water{position:absolute;left:7px;top:12px;width:42px;height:12px;border:2px solid #bcdce5;border-radius:50%;background:linear-gradient(#9fe8ff,#279ace)}
+.water-bucket{position:absolute;left:-28px;top:-28px;width:56px;height:56px;animation:bucket-delivery 3s ease-out var(--age) both;transform-origin:50% 50%}
+.water-stream{position:absolute;left:-7px;top:calc(var(--pour-lift)*-1);width:14px;height:calc(var(--pour-lift) + var(--target-height)*.55);border-radius:45%;background:linear-gradient(90deg,#e2fbffbb,#37bcebe6 45%,#93edffcc);box-shadow:0 0 8px #9becff77;transform-origin:50% 0;animation:water-pour 3s ease-out var(--age) both}
+.water-cube{position:absolute;left:calc(var(--target-width)/-2);top:calc(var(--target-height)/-2);width:var(--target-width);height:var(--target-height);border:3px solid #b7f4ff;border-radius:7px;background:linear-gradient(145deg,#8ceaff,#45bde6 55%,#288ccc);box-shadow:inset 5px 5px 0 #dcfcff66,inset -5px -5px 0 #147cba55,0 0 18px #71dbff77;transform:translate(var(--dx),var(--dy));opacity:0;animation:water-form 3s ease-out var(--age) both;overflow:hidden}
+.water-cube::before{content:'';position:absolute;left:-10%;right:-10%;top:12%;height:10%;border-top:2px solid #d6fbffb3;border-radius:50%;transform:rotate(-8deg)}
+.cube-eye{position:absolute;top:43%;width:13%;height:17%;border:2px solid #164262;border-radius:50%;background:#f4fdff;transform-origin:center;animation:water-blink 3s linear var(--age) both}
+.cube-eye.left{left:25%}.cube-eye.right{right:25%}
+.cube-eye::after{content:'';position:absolute;left:35%;top:28%;width:45%;height:65%;border-radius:50%;background:#173c59}
+.cube-mouth{position:absolute;left:43%;top:66%;width:16%;height:8%;border-bottom:2px solid #194964;border-radius:50%}
+.tomato-ball{position:relative;display:block;width:42px;height:40px;border:2px solid #9e281d;border-radius:48% 50% 45% 50%;background:radial-gradient(ellipse at 30% 25%,#ffb087,#f35936 36%,#d62f22 72%,#ac1b22);box-shadow:inset -3px -3px 0 #a31d1744,0 3px 6px #571c1c55}
+.tomato-ball::before{content:'';position:absolute;left:13px;top:-5px;width:15px;height:10px;border-radius:0 80% 0 80%;background:#2a853d;transform:rotate(25deg);box-shadow:-9px 0 0 -1px #3b9b48,9px -1px 0 -1px #25713a}
+.tomato-ball::after{content:'';position:absolute;left:20px;top:-10px;width:4px;height:9px;border-radius:3px;background:#27693b;transform:rotate(15deg)}
+.tomato-projectile{position:absolute;left:-21px;top:-20px;width:42px;height:40px;animation:tomato-delivery 3s ease-out var(--age) both}
+.tomato-impact{position:absolute;left:0;top:0;width:0;height:0;transform:translate(var(--dx),var(--dy))}
+.tomato-burst{position:absolute;left:-36px;top:-36px;width:72px;height:72px;border:4px solid #ffb354;border-radius:50%;background:radial-gradient(circle,#fff1a9 0 12%,#ff954a99 28%,#f4432633 55%,transparent 70%);opacity:0;animation:tomato-flash 3s ease-out var(--age) both}
+.tomato-piece{position:absolute;left:-8px;top:-6px;width:16px;height:12px;border-radius:65% 25% 55% 30%;border:1px solid #b8261b;background:#ee482e;opacity:0;animation:tomato-scatter 3s ease-out var(--age) both}
+.tomato-piece::before{content:'';position:absolute;left:5px;top:3px;width:3px;height:5px;border-radius:50%;background:#ffdea1;transform:rotate(-25deg)}
+.tomato-splat{position:absolute;left:-27px;top:-22px;width:54px;height:44px;border-radius:45% 55% 52% 42%;background:#df3b28;box-shadow:0 2px 6px #78201666;opacity:0;animation:tomato-stain 3s ease-out var(--age) both}
+.tomato-splat::before{content:'';position:absolute;left:7px;top:6px;width:15px;height:11px;border-radius:50%;background:#f67145;box-shadow:-15px -12px 0 -3px #df3b28,43px 10px 0 -3px #df3b28,7px 39px 0 -3px #df3b28,31px -21px 0 -3px #df3b28,-23px 25px 0 -4px #df3b28}
+@keyframes bucket-delivery{0%{opacity:1;transform:translate(0,0) rotate(-12deg) scale(.8)}10%{opacity:1;transform:translate(var(--mx),var(--my)) rotate(12deg)}20%{opacity:1;transform:translate(calc(var(--dx) + var(--bucket-x)),calc(var(--dy) - var(--pour-lift))) rotate(0)}28%,41%{opacity:1;transform:translate(calc(var(--dx) + var(--bucket-x)),calc(var(--dy) - var(--pour-lift))) rotate(var(--tip))}49%,100%{opacity:0;transform:translate(calc(var(--dx) + var(--bucket-x)),calc(var(--dy) - var(--pour-lift))) rotate(var(--tip))}}
+@keyframes water-pour{0%,26%{opacity:0;transform:translate(var(--dx),var(--dy)) scaleY(0)}31%,43%{opacity:1;transform:translate(var(--dx),var(--dy)) scaleY(1)}50%,100%{opacity:0;transform:translate(var(--dx),var(--dy)) scaleY(.3)}}
+@keyframes water-form{0%,35%{opacity:0}43%,88%{opacity:1}100%{opacity:0}}
+@keyframes water-blink{0%,47%,55%,71%,80%,100%{transform:scaleY(1)}50%,52%,74%,77%{transform:scaleY(.08)}}
+@keyframes tomato-delivery{0%{opacity:1;transform:translate(0,0) rotate(-20deg) scale(.9)}12%{opacity:1;transform:translate(var(--mx),var(--my)) rotate(130deg)}23%{opacity:1;transform:translate(var(--dx),var(--dy)) rotate(245deg) scale(.9)}25%,100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(260deg) scale(.4)}}
+@keyframes tomato-flash{0%,22%{opacity:0;transform:scale(.2)}26%{opacity:1;transform:scale(.75)}38%{opacity:0;transform:scale(1.6)}100%{opacity:0;transform:scale(1.6)}}
+@keyframes tomato-scatter{0%,22%{opacity:0;transform:translate(0,0) scale(.2)}25%{opacity:1;transform:translate(0,0) scale(1)}44%{opacity:1;transform:translate(var(--burst-x),var(--burst-y)) rotate(var(--turn)) scale(.75)}61%,100%{opacity:0;transform:translate(var(--burst-x),var(--burst-y)) rotate(var(--turn)) scale(.25)}}
+@keyframes tomato-stain{0%,23%{opacity:0;transform:scale(.2)}31%{opacity:1;transform:scale(1.15)}40%,82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.water-bucket,.water-stream,.tomato-projectile,.tomato-burst,.tomato-piece{display:none}.water-cube,.tomato-splat{animation:none;opacity:1}.cube-eye{animation:none}}

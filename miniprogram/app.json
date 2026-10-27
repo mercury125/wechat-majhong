@@ -1,0 +1,13 @@
+{
+  "pages": ["pages/lobby/index", "pages/table/index", "pages/replays/index", "pages/verify/index"],
+  "window": {
+    "navigationStyle": "custom",
+    "pageOrientation": "landscape",
+    "backgroundColor": "#102f29",
+    "backgroundTextStyle": "light"
+  },
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "resizable": true
+}

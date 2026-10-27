@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-10-24",
+  "generator": "Built-in image_gen",
+  "columns": 3,
+  "rows": 2,
+  "frames": [
+    "neutral",
+    "greet",
+    "joy",
+    "smug",
+    "shock",
+    "cry"
+  ],
+  "files": [
+    {
+      "file": "ironclad-sheet.png",
+      "bytes": 2667560,
+      "sha256": "bf6abf198674ffcdbb97837817a429fcbbd51fdbf5896c5bc2ede4846380803c",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "file": "ironclad-sheet.webp",
+      "bytes": 225516,
+      "sha256": "66a73411101e25b9e1c6379069dd527c6fe526d23743d6f0414eee2e6696e11f",
+      "width": 1152,
+      "height": 768,
+      "alpha": true
+    },
+    {
+      "file": "silent-sheet.png",
+      "bytes": 2489854,
+      "sha256": "f874768a66ecf6e6d6ec75475161b3221c04ec0f7d3d9c0330af7520f9c52b3c",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "file": "silent-sheet.webp",
+      "bytes": 208856,
+      "sha256": "2ec32b96b7810f81a1e1fbc1cccd683ba099859dd78f09916dc34580bab5b8a6",
+      "width": 1152,
+      "height": 768,
+      "alpha": true
+    },
+    {
+      "file": "defect-sheet.png",
+      "bytes": 2477631,
+      "sha256": "c2171d16a7a66280da8ef1683c1c0c3914fc1254dbb5795bab9000e7115864eb",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "file": "defect-sheet.webp",
+      "bytes": 246886,
+      "sha256": "313b9fc510c867703319af7545066bbc556297f3ee4423bc698953f1635ced85",
+      "width": 1152,
+      "height": 768,
+      "alpha": true
+    },
+    {
+      "file": "watcher-sheet.png",
+      "bytes": 2506163,
+      "sha256": "4bce6a16e393f01623c19923119cb8730d41ad4abcdbac98c4c898c0a882612c",
+      "width": 1536,
+      "height": 1024,
+      "alpha": true
+    },
+    {
+      "file": "watcher-sheet.webp",
+      "bytes": 218088,
+      "sha256": "724aff6b936534904db9e9a5e99f75f43cfdd4e7d4df6e9a888c4ea47942f69c",
+      "width": 1152,
+      "height": 768,
+      "alpha": true
+    }
+  ]
+}

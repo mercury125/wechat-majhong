@@ -1,0 +1,10 @@
+node_modules/
+.cache/
+data/
+test-output/
+.env
+miniprogram/config.local.js
+miniprogram/assets/
+miniprogram/lib/example.js
+project.private.config.json
+cloudfunctions/api/shared/

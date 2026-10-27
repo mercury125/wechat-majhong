@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#133f35">
+<title>好友麻将 · 尖塔主题试玩</title>
+<style>
+
+[hidden]{display:none!important}
+
+:root{color-scheme:dark;--ink:#f5edda;--muted:#b6bfad;--gold:#d8b970;--wood:#5d4330}
+
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 80% 0,#304535,transparent 65%),#102923;color:var(--ink);font:14px/1.6 system-ui,"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh}
+main{max-width:1280px;margin:auto;padding:24px}
+button,input{font:inherit}
+button{min-height:44px;border:1px solid #96845d80;border-radius:6px;background:#244e41;color:var(--ink);padding:8px 16px;cursor:pointer;transition:background .18s,transform .18s}
+button:hover{background:#39644e}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #f4d68b;outline-offset:3px}
+button:disabled{opacity:.45;cursor:default}
+button.primary{color:#332c1c;background:linear-gradient(#eed7a1,#c6a45d);border-color:#f0d8a5;font-weight:700}
+button.primary:hover{background:#f2d99e}
+button.ghost{background:#102f2a88}
+input{min-height:44px;width:100%;border:1px solid #94816070;border-radius:5px;padding:10px 12px;background:#0b261f;color:var(--ink)}
+input::placeholder{color:#8da493}
+h1,h2,h3,p{margin:0}
+h1,h2,.serif{font-family:"STSong","Songti SC","Noto Serif CJK SC",serif}
+h1{font-size:28px;letter-spacing:4px}
+h2{font-size:25px;letter-spacing:2px}
+h3{font-size:16px}
+.muted{color:var(--muted);font-size:12px}
+.eyebrow{font-size:11px;letter-spacing:3px;color:var(--gold)}
+.brand{display:flex;align-items:center;gap:15px}
+.brand-mark{width:42px;height:50px;display:grid;place-items:center;border:1px solid var(--gold);border-radius:5px;font:26px "STSong",serif;color:var(--gold);box-shadow:inset 0 0 0 4px #294c3b}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid #d8b97035;margin-bottom:24px;gap:12px}
+.online-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#9bcaa5;margin-right:7px}
+.topbar .muted{text-align:right}
+.lobby-grid{display:grid;grid-template-columns:minmax(280px,.85fr) 1.6fr;gap:24px;align-items:stretch}
+.panel{border:1px solid #a88f5b70;border-radius:10px;padding:24px;background:linear-gradient(135deg,#234638cc,#142f27ee);box-shadow:0 12px 35px #0002}
+.intro{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+.join-panel{display:flex;flex-direction:column;gap:18px}
+.join-panel label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.form-row{display:flex;align-items:flex-end;gap:8px}
+.form-row>div{flex:1}
+.form-row .number{flex:0 0 85px}
+.divider{height:1px;background:#d8b97030}
+.play-note{line-height:1.8}
+.character-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:24px 0 18px}
+.character-choice{padding:0 0 12px;position:relative;border:1px solid #ad9563;background:linear-gradient(145deg,var(--character),#0d2026);border-radius:9px;color:#fff5df;box-shadow:0 5px 0 #09221c,0 8px 16px #0003;overflow:hidden;isolation:isolate}
+.character-choice::before{content:"";position:absolute;inset:7px;border:1px solid #f9e0a860;border-radius:5px;z-index:-1}
+.character-choice:hover{background:linear-gradient(145deg,var(--character),#23382c);transform:translateY(-5px)}
+.character-choice[aria-pressed=true]{outline:2px solid #f2d498;outline-offset:3px}
+.character-choice .sprite{width:100%;height:auto;aspect-ratio:1;margin:12px 0 3px}
+.character-choice strong{display:block;font-size:16px;letter-spacing:2px}
+.character-choice .muted{color:#ede2c5c9;font-size:10px}
+.choice-mark{display:block;height:19px;font-size:10px;letter-spacing:1px;color:#ffe4a9}
+.sprite{display:inline-block;position:relative;width:66px;height:66px;overflow:hidden;vertical-align:middle;flex-shrink:0;pointer-events:none}
+.sprite img{position:absolute;width:300%;height:200%;max-width:none;object-fit:fill;left:var(--frame-x,0);top:var(--frame-y,0)}
+.gallery-hint{display:flex;align-items:center;justify-content:space-between;gap:10px}
+main.table-view{max-width:none;padding:0}
+
+.table-view .topbar{position:absolute;top:18px;right:18px;z-index:12;padding:0;margin:0;border:0}
+
+.table-view .topbar .brand,.table-view .topbar .muted,.table-view>details,.table-view .table-bottom{display:none}
+
+.table-view .topbar .row{margin:0;flex-wrap:nowrap;gap:8px}
+
+.table-view .topbar button{background:#171e36e6;border-color:#6e7096;color:#ece5d2;box-shadow:0 4px 10px #0005}
+
+.table-view #error{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px)}
+
+.room-heading{position:relative;display:flex;justify-content:space-between;gap:12px;margin:24px 0 12px}
+.table-view .room-heading{position:absolute;display:block;margin:0;left:24px;top:123px;z-index:6;max-width:220px;pointer-events:none;text-shadow:0 2px 5px #000}
+
+.room-heading strong{font-family:"STSong",serif;font-size:17px;letter-spacing:2px;color:#e2c189}
+
+.room-meta{font-size:11px;color:#b4b7cf}
+
+.room-heading>span{display:block;margin-top:5px;font-size:11px;color:#d9d3df}
+
+.table{--face-width:clamp(40px,5vw,96px);--face-height:calc(var(--face-width)*1.35);--back-width:clamp(30px,3.4vw,64px);--back-height:calc(var(--back-width)*1.35);position:relative;isolation:isolate;min-height:680px;height:100svh;overflow:hidden;border:1px solid #706781;border-radius:0;background:radial-gradient(ellipse at 50% 55%,#282e43,#080e1b);box-shadow:inset 0 0 100px #070c20, inset 0 0 0 12px #131b2c99}
+
+.table::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,#030916aa);pointer-events:none;z-index:2}
+
+.board-info{position:absolute;top:22px;left:24px;z-index:5;display:flex;gap:18px;padding:12px 18px 10px;border:2px solid #b79b6a;border-radius:8px;background:linear-gradient(150deg,#24344c,#111b30);box-shadow:0 6px 14px #0005,inset 0 0 0 3px #697b9533}
+
+.board-info>div{text-align:center}
+
+.board-info .label{display:block;color:#dbd3bd;font-size:10px;line-height:15px;letter-spacing:2px}
+
+.board-info .tile{--tile-width:32px;--tile-height:43px;--tile-depth:9px}
+
+.board-info .tiles{min-height:0}
+
+.seat{position:absolute;z-index:5;width:104px;display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+
+.seat.top{top:5%;left:70%;transform:translateX(-50%)}
+
+.seat.right{top:28%;right:16px}
+
+.seat.left{top:28%;left:16px}
+
+.seat.bottom{left:24%;bottom:calc(var(--face-height) + 58px);width:120px;transform:translateX(-50%)}
+
+.avatar{display:flex;align-items:center;justify-content:center;position:relative;width:76px;height:84px;border:2px solid #c8aa6a;border-radius:4px;background:linear-gradient(145deg,var(--character),#192237);box-shadow:0 4px 15px #0008,inset 0 0 0 2px #f8e0a52b;flex-shrink:0}
+
+.avatar .sprite{width:74px;height:74px}
+.avatar[data-avatar-target]{padding:0;min-height:44px;cursor:pointer}
+.avatar[data-avatar-target]:hover{outline:2px solid #f2d99c;outline-offset:3px}
+
+.seat.bottom .avatar{width:88px;height:98px}
+
+.seat.bottom .avatar .sprite{width:86px;height:86px}
+
+.seat.acting .avatar{border-color:#ffe4a4;box-shadow:0 0 0 3px #d4b06b44,0 0 24px #eec87966}
+
+.seat>div:nth-child(2){width:100%}
+
+.seat-name{display:block;width:100%;max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:1px 5px;background:#111729cc;color:#f2ebde;font-size:12px;line-height:20px}
+
+.seat-score{font-size:16px;color:#ffe4a4;font-variant-numeric:tabular-nums}
+
+.has-match .seat-score{display:none}
+
+.seat .muted{display:block;color:#c5bfd5;font-size:10px;line-height:17px;text-shadow:0 1px 4px #000}
+
+.dealer{display:inline-block;color:#392f24;background:#dab77d;border-radius:2px;font-size:10px;line-height:15px;padding:0 3px;margin-right:3px}
+
+.rack{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;gap:8px;transform-style:preserve-3d;transform-origin:center}
+.rack.bottom{bottom:24px;left:50%;max-width:94%;transform:translateX(-50%);perspective:1100px;perspective-origin:50% -180px}
+.tiles{display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:2px;min-height:0;transform-style:preserve-3d}
+.tile{--tile-width:40px;--tile-height:54px;--tile-depth:12px;display:inline-block;position:relative;flex-shrink:0;vertical-align:middle;width:var(--tile-width);height:var(--tile-height);min-height:0;padding:0;border:0;border-radius:4px;background:transparent;box-shadow:none;overflow:visible;transform-style:preserve-3d}
+.tile:hover{background:transparent}
+.tile::before{content:"";position:absolute;inset:3px -2px -5px;border-radius:5px;background:#060a1770;filter:blur(3px);transform:translateZ(.1px);pointer-events:none}
+.tile-model{position:absolute;top:0;left:0;width:var(--tile-width);height:var(--tile-height);transform:rotateX(-10deg);transform-style:preserve-3d;transition:transform .14s;pointer-events:none}
+.tile-face{position:absolute;display:block;backface-visibility:hidden;box-sizing:border-box;border-radius:3px;box-shadow:inset 0 0 0 1px #ffffff38;pointer-events:none}
+.tile-front,.tile-back{inset:0;border:1px solid #e9e3d0;overflow:hidden}
+.tile-front{background:#f8f3e6 url('/assets/tiles/Front.png') center/100% 100%;transform:translateZ(calc(var(--tile-depth)/2))}
+.tile-front>img{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tile-back{background:linear-gradient(135deg,var(--character),#203247);transform:rotateY(180deg) translateZ(calc(var(--tile-depth)/2))}
+.rack.bottom .tile.hidden .tile-front{background:linear-gradient(135deg,var(--character),#203247);border-color:#e8d18e}
+.tile-back::before{content:"";position:absolute;inset:3px;border:1px solid #e8d18e99;border-radius:2px}
+.tile-back>.sprite,.tile.hidden .tile-front>.sprite{position:absolute;left:5%;top:50%;width:90%;height:calc(var(--tile-width)*.9);transform:translateY(-50%)}
+.tile-top,.tile-base{left:0;width:var(--tile-width);height:var(--tile-depth);background:linear-gradient(#fffdf2 0 67%,#dbd6c3 70%,var(--character) 73%)}
+.tile-top{top:calc(var(--tile-depth)/-2);transform:rotateX(90deg)}
+.tile-base{top:calc(var(--tile-height) - var(--tile-depth)/2);transform:rotateX(-90deg);background:linear-gradient(#b8b8a4 0 65%,var(--character) 68%)}
+.tile-left,.tile-right{top:0;width:var(--tile-depth);height:var(--tile-height)}
+.tile-left{left:calc(var(--tile-depth)/-2);transform:rotateY(-90deg);background:linear-gradient(90deg,var(--character) 0 27%,#c5c5af 30%,#e9e5d5 70%,#f6f1e4)}
+.tile-right{left:calc(var(--tile-width) - var(--tile-depth)/2);transform:rotateY(90deg);background:linear-gradient(90deg,#fffbed,#e3dfce 67%,#c5c5af 70%,var(--character) 73%)}
+.tile.wild .tile-front{outline:1px solid #f0d682}
+.tile.wild .tile-front::after{content:'癞';position:absolute;top:0;right:0;padding:0 1px;border-radius:0 2px 0 2px;background:#88602f;color:#fff3cf;font-size:clamp(5px,calc(var(--tile-width)*.18),8px);line-height:1.1}
+.tile.latest{margin-left:20px}
+.table-world>.rack .tile.latest{margin-left:calc(var(--back-width)*.5)}
+.tile[data-tile]:hover .tile-model{transform:translateY(-6px) translateZ(5px) rotateX(-10deg)}
+.tile.selected[data-tile] .tile-model{transform:translateY(-12px) translateZ(8px) rotateX(-10deg)}
+.tile.selected .tile-front{outline:3px solid #ffe0a1}
+.tile[draggable=true]{cursor:grab}
+.small .tile{--tile-width:23px;--tile-height:31px;--tile-depth:8px}
+.small .tile.wild .tile-front::after{font-size:5px;line-height:6px}
+.rack.bottom>.tiles>.tile{--tile-width:var(--face-width);--tile-height:var(--face-height);--tile-depth:calc(var(--face-width)*.38)}
+.melds{display:flex;align-items:center;gap:6px;transform-style:preserve-3d}
+.melds>div{transform-style:preserve-3d}
+.melds .muted{font-size:10px;color:#e4d6b6}
+.tile.claimed .tile-face{opacity:.35}
+.table-camera{position:absolute;inset:0;z-index:1;perspective:clamp(750px,70vw,1300px);perspective-origin:50% 45%;pointer-events:none}
+.table-world{position:absolute;top:45%;left:50%;width:90%;height:150%;transform:translate(-50%,-50%) rotateX(42deg);transform-style:preserve-3d}
+.table-surface{position:absolute;inset:-12px;border:12px solid #172238;border-radius:18px;background:repeating-linear-gradient(0deg,#ffffff02 0 1px,transparent 1px 3px),radial-gradient(ellipse at 50% 42%,#515469,#353b53 70%);box-shadow:inset 0 0 0 2px #aaa08c55,inset 0 0 100px #182138,0 0 0 2px #77758c,0 0 0 12px #0b1527;transform:translateZ(-3px)}
+.table-world>.rack,.table-world .pond-ring,.table-world .pond{z-index:auto;transform-style:preserve-3d}
+.table-world>.rack.top{top:8%;left:50%;transform:translateX(-50%) rotateZ(180deg)}
+.table-world>.rack.left{left:12%;top:50%;transform:translate(-50%,-50%) rotateZ(90deg)}
+.table-world>.rack.right{right:12%;top:50%;transform:translate(50%,-50%) rotateZ(-90deg)}
+.table-world>.rack>.tiles>.tile{--tile-width:var(--back-width);--tile-height:calc(var(--back-width)*1.45);--tile-depth:calc(var(--back-width)*.42);height:var(--tile-depth)}
+.table-world .tile-model{transform:translateZ(calc(var(--tile-depth)/2))}
+.table-world>.rack>.tiles>.tile>.tile-model{top:auto;bottom:calc(var(--tile-depth)/2);transform-origin:center bottom;transform:rotateX(-90deg)}
+.table-world .melds .tile.hidden>.tile-model{transform:translateZ(calc(var(--tile-depth)/2)) rotateY(180deg)}
+.table-world .pond-ring{top:50%;transform:translate(-50%,-50%) scale(1.1)}
+.table-world .center-square{transform:translateZ(7px);transform-style:preserve-3d}
+
+.pond-ring{position:absolute;top:45%;left:50%;width:684px;height:596px;display:grid;grid-template-columns:208px 252px 208px;grid-template-rows:164px 252px 164px;gap:8px;transform:translate(-50%,-50%);transform-origin:center;z-index:2}
+
+.center-square{grid-area:2/2;position:relative;width:252px;height:252px;display:grid;grid-template-columns:60px 1fr 60px;grid-template-rows:36px 1fr 36px;padding:7px;border:3px solid #9b90a2;border-radius:21px;background:linear-gradient(145deg,#555365,#252c43);box-shadow:0 0 0 5px #20263c,0 0 0 7px #80718c,0 8px 15px #0008,inset 0 0 0 2px #151b2c}
+
+.center-core{grid-area:2/2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:2px solid #8d819d;border-radius:12px;background:#151e33;box-shadow:inset 0 2px 12px #0008}
+
+.hand-progress{font-size:30px;line-height:34px;font-family:"STSong",serif;font-weight:800;color:#7ed3de;white-space:nowrap}
+
+.hand-progress-caption{font-size:26px;line-height:30px;color:#f4eff7}
+
+.center-remaining{font-size:30px;line-height:36px;color:#8bd7de}
+
+.center-status{max-width:100%;font-size:24px;line-height:28px;color:#f4eff7;text-align:center}
+
+.center-score{display:flex;align-items:center;justify-content:center;color:#eed09a;font-size:30px;line-height:34px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.center-score small{font-size:16px;margin-left:3px}
+
+.center-score.top{grid-area:1/2}
+
+.center-score.bottom{grid-area:3/2}
+
+.center-score.left{grid-area:2/1;font-size:26px;flex-direction:column}
+
+.center-score.right{grid-area:2/3;font-size:26px;flex-direction:column}
+
+.center-score.acting{color:#fff4c4;text-shadow:0 0 10px #ffc266}
+
+.pond{position:relative;z-index:1;display:block;padding:0;overflow:visible}
+
+.pond.top{grid-area:1/2;align-self:end;justify-self:center}
+
+.pond.bottom{grid-area:3/2;align-self:start;justify-self:center}
+
+.pond.left{grid-area:2/1;align-self:center;justify-self:end}
+
+.pond.right{grid-area:2/3;align-self:center;justify-self:start}
+
+.pond .tiles{transform-style:preserve-3d;display:grid;grid-template-columns:repeat(6,25px);grid-auto-rows:32px;gap:1px;width:155px;min-height:0;justify-content:start}
+
+.pond .tile{--tile-width:24px;--tile-height:31px;--tile-depth:7px;justify-self:center;align-self:center}
+
+.pond .tile.wild .tile-front::after{font-size:5px;line-height:6px;padding:0}
+
+.pond.top .tile{transform:rotate(180deg)}
+
+.pond.left,.pond.right{width:136px;height:155px}
+.pond.left .tiles,.pond.right .tiles{transform-style:preserve-3d;position:absolute;transform-origin:top left}
+.pond.left .tiles{left:100%;top:0;transform:rotate(90deg)}
+.pond.right .tiles{left:0;top:100%;transform:rotate(-90deg)}
+.pond.left .tile{transform:none}
+
+.pond.right .tile{transform:none}
+
+
+
+
+
+
+
+
+
+.tile.discard-gap{width:0;margin-right:-2px;visibility:hidden;pointer-events:none;animation:hand-close .28s ease-out forwards}
+@keyframes hand-close{0%,35%{width:var(--tile-width);margin-right:0}100%{width:0;margin-right:-2px}}
+
+.emote-bubble{position:absolute;bottom:25px;left:calc(100% + 10px);display:flex;align-items:center;justify-content:center;z-index:12;width:110px;height:114px;border:2px solid #b7985f;border-radius:16px 16px 16px 3px;background:#fbf4dd;box-shadow:0 7px 22px #0018;color:#665134}
+
+.emote-bubble .sprite{width:100px;height:100px}
+
+.seat.right .emote-bubble,.seat.top .emote-bubble{left:auto;right:calc(100% + 10px);border-radius:16px 16px 3px 16px}
+
+.emote-caption{position:absolute;bottom:1px;border-radius:4px;background:#fbf4dddb;padding:0 4px;font-size:10px}
+
+.action-tray{position:absolute;left:12px;bottom:150px;z-index:6;display:flex;flex-direction:column;align-items:stretch;gap:8px;width:50px}
+
+.action-tray button{box-shadow:0 3px 10px #0007}
+
+.action-tray.mahjong-actions button{width:50px;min-width:50px;height:44px;padding:0;font-size:16px;font-weight:700;background:#141e37e6;border-color:#79829b;color:#ebe2cd}
+
+.action-tray.mahjong-actions button.active{border-color:#dfb46d;color:#f5d295;background:linear-gradient(#49404d,#24273d)}
+.call-flash{position:fixed;left:50%;top:44%;z-index:30;transform:translate(-50%,-50%);padding:8px 20px;border:2px solid #ffe3a0;border-radius:14px;background:#1b2a39ee;color:#ffe8a8;font-size:36px;font-weight:700;letter-spacing:4px;text-shadow:0 0 18px #d99f3e;box-shadow:0 0 28px #000a,0 0 30px #d7a44b66;pointer-events:none;animation:call-flash 1.5s ease-out both}
+.call-flash.bottom{top:68%}.call-flash.top{top:24%}.call-flash.left{left:22%}.call-flash.right{left:78%}
+@keyframes call-flash{0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}25%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}65%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-56%) scale(.92)}}
+@media(prefers-reduced-motion:reduce){.call-flash{animation:none}}
+
+.call-menu{position:absolute;right:max(26px,calc(50% - var(--face-width)*5.5 - 30px));bottom:calc(var(--face-height) + 50px);z-index:8;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:14px;max-width:calc(100% - 120px);pointer-events:none}
+.decision-button{position:relative;isolation:isolate;flex:0 0 108px;width:108px;height:96px;min-width:0;padding:0;border:0;border-radius:0;background:none;color:#d2fbff;box-shadow:none;pointer-events:auto;filter:drop-shadow(0 5px 6px #0008);transition:transform .15s ease}
+.decision-button:hover{transform:translateY(-4px);background:none}
+.decision-button:active{transform:translateY(1px)}
+.decision-plate{position:absolute;inset:27px 3px 15px;border:2px solid #77cbdb;transform:skewX(-12deg) rotate(-5deg);background:linear-gradient(135deg,#215469,#152c41);box-shadow:inset 0 0 0 3px #111e35aa,inset 0 0 0 5px #97e9ef33}
+.decision-button.kong .decision-plate{border-color:#e9bf6b;background:linear-gradient(135deg,#7b6133,#382f28)}
+.decision-button.win .decision-plate{border-color:#ed9d70;background:linear-gradient(135deg,#b84448,#5c2538);box-shadow:inset 0 0 0 3px #4c1c2b88,inset 0 0 0 5px #ffd48944,0 0 20px #f8b95555}
+.decision-button.pass .decision-plate{border-color:#9c9fa8;background:linear-gradient(135deg,#555965,#292d3a)}
+.decision-glyph{position:absolute;inset:25px 0 12px;display:flex;justify-content:center;align-items:center;font-family:"STKaiti","KaiTi","STSong",serif;font-size:39px;font-weight:900;line-height:1;color:#d6f8fa;text-shadow:2px 2px #142333,-1px -1px #1a2f42,0 0 9px #09273c;transform:rotate(-5deg)}
+.decision-button.win .decision-glyph,.decision-button.kong .decision-glyph{color:#ffedac;text-shadow:2px 2px #5a2425,-1px -1px #5a2425,0 0 12px #ffca7055}
+.decision-button.pass .decision-glyph{color:#d9d7d1;font-size:33px}
+.decision-preview{position:absolute;top:0;left:0;width:100%;display:flex;justify-content:center;gap:1px;height:25px}
+.decision-preview img{width:17px;height:24px;object-fit:contain;background:#fff4d8;border:1px solid #a38c5f;border-bottom:3px solid #b39e70;border-radius:2px}
+.decision-note{position:absolute;left:0;bottom:0;width:100%;font-size:10px;line-height:13px;text-align:center;white-space:nowrap;color:#f1dfb6;text-shadow:0 1px 3px #000}
+.win-celebration{position:fixed;inset:0;z-index:40;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,#ffd57325,transparent 58%);animation:win-veil var(--win-duration,1.6s) ease both}
+.win-rays{position:absolute;left:50%;top:46%;width:min(100vw,850px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:repeating-conic-gradient(from 0deg,#ffdc7e22 0deg 2deg,transparent 2deg 20deg);mask-image:radial-gradient(circle,transparent 12%,#000 34%,transparent 68%);animation:win-rays var(--win-duration,1.6s) ease-out both}
+.win-halo{position:absolute;left:50%;top:46%;width:240px;height:240px;border:2px solid #ffe7a9;border-radius:50%;box-shadow:0 0 24px #ffca73,inset 0 0 28px #ffc55e55;animation:win-halo var(--win-duration,1.6s) ease-out both}
+.win-ribbon{position:absolute;left:50%;top:46%;width:min(90vw,500px);padding:25px 20px;text-align:center;transform:translate(-50%,-50%) rotate(-5deg);background:linear-gradient(90deg,transparent,#751c2cdd 22%,#4a2035ee 78%,transparent);border-top:1px solid #f3c878aa;border-bottom:1px solid #f3c878aa;animation:win-ribbon var(--win-duration,1.6s) cubic-bezier(.2,.8,.2,1) both}
+.win-ribbon strong{display:block;color:#ffe29a;font-family:"STKaiti","KaiTi","STSong",serif;font-size:clamp(68px,11vw,130px);font-weight:900;line-height:1.1;letter-spacing:16px;text-indent:16px;text-shadow:3px 3px #692c21,-1px -1px #fff1c1,0 0 25px #ffbe55aa}
+.win-winner,.win-kind{display:block;color:#fff0cc;text-shadow:0 2px 5px #351420}
+.win-winner{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;letter-spacing:2px}
+.win-kind{font-size:16px;letter-spacing:8px;margin-top:6px}
+.win-spark{position:absolute;left:50%;top:46%;width:0;height:0}
+.win-spark i{display:block;width:12px;height:3px;border-radius:50%;background:#fff1ab;box-shadow:0 0 10px #ffd16a;animation:win-spark 1.4s ease-out both}
+@keyframes win-veil{0%{opacity:0}15%,75%{opacity:1}100%{opacity:0}}
+@keyframes win-rays{0%{opacity:0;transform:translate(-50%,-50%) rotate(-20deg) scale(.5)}35%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) rotate(15deg) scale(1.2)}}
+@keyframes win-halo{0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(2.1)}}
+@keyframes win-ribbon{0%{opacity:0;transform:translate(-50%,-50%) rotate(-8deg) scale(.35)}22%{opacity:1;transform:translate(-50%,-50%) rotate(-5deg) scale(1.08)}38%,78%{opacity:1;transform:translate(-50%,-50%) rotate(-5deg) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) rotate(-5deg) scale(1.08)}}
+@keyframes win-spark{0%{opacity:0;transform:translateX(20px) scaleX(.2)}15%{opacity:1}100%{opacity:0;transform:translateX(290px) scaleX(1.8)}}
+@media(prefers-reduced-motion:reduce){.win-rays,.win-halo,.win-spark{display:none}.win-celebration,.win-ribbon{animation:none}}
+
+.table-tools{position:absolute;bottom:20px;right:18px;z-index:7;display:flex;gap:7px}
+
+.table-tools button{padding:8px 12px;font-size:12px;border-color:#77728c;background:#161e36e6;color:#e8deca}
+
+.table-tools button.primary{border-color:#d3ae6b;background:linear-gradient(#49404d,#24273d);color:#f5d295}
+
+.table-view .popover{border-color:#b69d75;background:#171e35f5}
+
+.table-view .result{position:fixed;top:50%;left:50%;z-index:20;width:min(1040px,calc(100% - 32px));max-height:calc(100svh - 32px);overflow:auto;transform:translate(-50%,-50%);margin:0;background:#192239f5;box-shadow:0 15px 60px #000a}
+
+.settings-options{display:flex;flex-direction:column;gap:10px}
+
+.settings-options .row button{flex:1}
+
+.settings-options details{border-top:1px solid #8a7a5d55}
+
+.settings-options .hash{margin:8px 0}
+
+.settings-options .payments{max-height:180px}
+.table-view .settings-options button,.table-view .popover .intro>button{background:#242d46;border-color:#77728c;color:#e8deca}
+.table-view .settings-options button:hover{background:#35405e}
+
+.ready-panel{position:absolute;left:50%;top:64%;transform:translate(-50%,-50%);display:flex;gap:10px;z-index:4;align-items:center;justify-content:center;flex-wrap:wrap;width:90%;text-align:center}
+.ready-panel .muted{width:100%;font-size:11px}
+.ready-panel .room-hands{width:90px}
+.table-bottom{display:flex;justify-content:space-between;gap:15px;margin:14px 0;align-items:flex-start}
+.payments{font-size:11px;max-height:70px;overflow:auto;color:var(--muted)}
+details{font-size:12px;color:var(--muted)}
+summary{cursor:pointer;min-height:44px;display:flex;align-items:center;gap:8px}
+summary::before{content:'＋';color:var(--gold)}
+details[open]>summary::before{content:'－'}
+details p{margin-bottom:12px}
+pre,.hash{font-size:11px;white-space:pre-wrap;word-break:break-all}
+.hash{font-family:monospace;max-width:500px}
+.result{padding:18px 22px;margin-top:14px;border:1px solid #a88d52;background:#234f40;border-radius:8px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.result strong{font:24px "STSong",serif;color:#f3db9a}
+.result pre{width:100%;font-family:inherit}
+.settlement{width:100%}.settlement-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settlement p{margin:10px 0}.settlement-players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.settlement-player{padding:14px;border:1px solid #77708b66;border-radius:6px;background:#10192c77}
+.settlement-score{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums}
+.settlement-score b{flex:1;min-width:60px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.score-gain{color:#9be2bf}.score-loss{color:#ffaba1}
+.settlement-cards{display:flex;gap:8px 12px;flex-wrap:wrap;margin-top:8px}
+.settlement-group{display:flex;flex-direction:column;gap:3px}.settlement-group small{font-size:11px;color:#c3bcd0}
+.settlement .tiles{gap:1px;justify-content:flex-start;flex-wrap:wrap}.settlement .tiles .tile{--tile-width:clamp(22px,2.8vw,32px);--tile-height:calc(var(--tile-width)*1.35);--tile-depth:5px}
+.settlement-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.settlement-actions button{flex:1;min-width:100px}
+.match-final{margin:10px 0;padding:10px;border:1px solid #d0b36b;border-radius:7px;background:#443c3255}
+.match-final h3{margin:0 0 8px;font-size:16px;color:#ffe0a0}.final-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.final-scores>div{display:flex;flex-direction:column;align-items:center;min-width:0}.final-scores span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.final-scores strong{font-size:21px}.final-scores small{font-size:10px}
+@media(max-width:600px){.final-scores{grid-template-columns:repeat(2,1fr)}.settlement-players{grid-template-columns:1fr}}
+.popover{position:fixed;right:26px;bottom:26px;width:380px;max-width:calc(100vw - 28px);max-height:calc(100svh - 52px);overflow-y:auto;z-index:30;border:1px solid var(--gold);border-radius:12px;background:#173a2ff5;box-shadow:0 18px 70px #0009;padding:18px;backdrop-filter:blur(14px)}
+.popover .intro{margin:0 0 12px}
+.popover .intro button{padding:4px 12px;font-size:20px}
+.popover .character-gallery{gap:8px;margin:10px 0}
+.emote-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.emote-option{padding:5px 2px;background:#f3ead5;color:#584831;border-color:#c8ac77}
+.emote-option:hover{background:#fff4d4}
+.emote-option .sprite{width:100%;height:auto;aspect-ratio:1}
+.emote-option span:last-child{display:block;font-size:11px}
+.emote-tabs{display:flex;gap:8px;margin-bottom:10px}
+.emote-tabs button{flex:1;min-width:0;padding:8px 4px;font-size:12px}
+.popover .intro>button{min-width:44px;min-height:44px}
+.emote-tabs [aria-pressed=true]{color:#ffe3a3;border-color:#d1ab63;background:#80623955}
+.emote-grid.common{grid-template-columns:repeat(4,1fr)}
+.interaction-targets{display:flex;gap:6px;margin:8px 0}
+.interaction-targets button{flex:1;min-width:0;min-height:44px;padding:6px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.interaction-targets [aria-pressed=true]{color:#ffe3a3;border-color:#d1ab63;background:#80623955}
+.interaction-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.interaction-grid button{display:flex;flex-direction:column;align-items:center;min-height:100px;padding:8px;background:#f3ead5;color:#584831}
+
+.common-emoji{display:flex;align-items:center;justify-content:center;font-size:46px;line-height:1.3;min-height:64px;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.emote-bubble>.common-emoji{font-size:62px}
+#error{position:sticky;bottom:12px;z-index:40;color:#ffdfcb;white-space:pre-wrap;background:#733d2fee;border-radius:6px;max-width:600px;margin:12px auto;padding:10px 16px;border:1px solid #d79f74}
+#error:empty{display:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
+}
+
+@media(min-width:1600px){
+
+ .seat{width:132px}
+ .avatar{width:100px;height:112px}
+ .avatar .sprite{width:98px;height:98px}
+ .seat.bottom{width:144px}
+ .seat.bottom .avatar{width:116px;height:130px}
+ .seat.bottom .avatar .sprite{width:114px;height:114px}
+ .seat-name{font-size:14px}
+ .seat .muted{font-size:11px}
+}
+
+@media(max-width:1099px){
+ .lobby-grid{grid-template-columns:1fr}
+
+
+ .seat{width:80px}
+
+ .seat.left,.seat.right{top:27%}
+
+ .avatar{width:62px;height:70px}
+
+ .avatar .sprite{width:60px;height:60px}
+
+ .seat.bottom{left:24%;width:96px}
+
+ .seat.bottom .avatar{width:72px;height:80px}
+
+ .seat.bottom .avatar .sprite{width:70px;height:70px}
+
+ .seat-name{font-size:11px}
+
+ .seat .muted{font-size:9px}
+
+ .table-tools{right:14px;bottom:14px}
+
+ .table-tools button{padding:8px 10px}
+
+}
+
+@media(max-width:600px){
+ main{padding:12px}
+
+ .topbar{margin-bottom:16px;padding-bottom:14px}
+
+ .brand-mark{display:none}
+
+ h1{font-size:24px}
+
+ .topbar .muted{max-width:130px;font-size:10px}
+
+ .panel{padding:18px}
+
+ .character-gallery{gap:8px}
+
+ .character-choice strong{font-size:14px}
+
+ .character-choice .muted{font-size:9px}
+
+ .gallery-hint{align-items:flex-start}
+
+ .intro h2{font-size:23px}
+
+ .table{--face-width:clamp(23px,calc((100vw - 34px)/11 - 2px),38px);--back-width:clamp(17px,5.8vw,24px);min-height:800px}
+
+ .table-view .topbar{top:10px;right:10px}
+
+ .table-view .topbar .row{gap:6px}
+
+ .table-view .topbar button{min-width:44px;padding:8px;font-size:12px}
+
+ .board-info{top:10px;left:10px;gap:14px;padding:7px 12px;border-width:1px}
+
+ .board-info .label{font-size:9px;line-height:13px}
+
+ .board-info .tile{--tile-width:23px;--tile-height:31px;--tile-depth:7px}
+
+ .table-view .room-heading{top:81px;left:10px;max-width:140px}
+
+ .room-heading strong{font-size:12px;letter-spacing:1px}
+
+ .table-view .room-meta,.table-view .room-heading>span{display:none}
+
+ .seat{width:68px;gap:3px}
+
+ .seat.top{top:10px;left:52%}
+
+ .seat.left,.seat.right{top:17%}
+
+ .seat.left{left:8px}
+
+ .seat.right{right:8px}
+
+ .avatar{width:52px;height:60px}
+
+ .avatar .sprite{width:50px;height:50px}
+
+ .seat-name{font-size:10px;line-height:18px;padding:0 3px}
+
+ .seat .muted{font-size:8px;line-height:13px;white-space:nowrap}
+
+ .seat.bottom{left:19%;bottom:calc(var(--face-height) + 116px);width:88px}
+
+ .seat.bottom .avatar{width:64px;height:74px}
+
+ .seat.bottom .avatar .sprite{width:62px;height:62px}
+
+
+
+
+
+ .rack.bottom{max-width:100%;width:100%;bottom:24px;gap:2px;flex-wrap:wrap}
+
+ .rack.bottom>.melds{width:100%}
+
+ .rack.bottom .tile.latest{margin-left:14px}
+
+ .small .tile{--tile-width:18px;--tile-height:24px;--tile-depth:6px}
+
+
+ .center-score{font-size:34px}
+
+ .center-score small{font-size:18px}
+
+ .hand-progress{font-size:32px;line-height:36px}
+
+ .center-remaining{font-size:34px;line-height:38px}
+
+ .center-status{font-size:24px;line-height:28px}
+
+ .hand-progress-caption{font-size:26px;line-height:30px}
+
+ .action-tray{left:50%;bottom:calc(var(--face-height) + 38px);width:auto;transform:translateX(-50%);flex-direction:row;gap:6px}
+
+ .action-tray.mahjong-actions button{width:44px;min-width:44px;font-size:15px}
+
+ .call-menu{right:12px;bottom:calc(var(--face-height) + 94px);max-width:calc(100% - 132px);gap:8px}
+ .decision-button{flex-basis:68px;width:68px;height:84px}
+ .decision-glyph{font-size:32px}
+ .decision-button.pass .decision-glyph{font-size:29px}
+ .decision-preview img{width:14px;height:21px}
+ .decision-note{font-size:9px}
+
+ .table-tools{right:10px;bottom:calc(var(--face-height) + 164px);flex-direction:column;gap:6px}
+
+ .table-tools button{padding:7px 9px;font-size:11px}
+
+ .emote-bubble{width:84px;height:88px;bottom:10px;left:calc(100% + 5px)}
+
+ .emote-bubble .sprite{width:78px;height:78px}
+
+ .seat.right .emote-bubble{left:auto;right:calc(100% + 5px)}
+
+ .seat.top .emote-bubble{top:98px;right:0;bottom:auto}
+
+ .emote-caption{font-size:8px}
+
+ .popover{right:12px;bottom:12px;padding:14px}
+
+ .ready-panel{top:68%;font-size:11px}
+
+ .ready-panel button{min-height:44px}
+
+ .table-view .result{padding:15px}
+
+}
+
+
+@media(max-height:600px) and (min-width:601px){
+ .table{--face-width:clamp(34px,4.7vw,64px);--back-width:clamp(25px,3.2vw,48px);min-height:0}
+
+
+ .seat{width:72px;gap:3px}
+
+ .seat.top{top:12px}
+
+ .seat.left,.seat.right{top:24%}
+
+ .avatar{width:50px;height:58px}
+
+ .avatar .sprite{width:48px;height:48px}
+
+ .seat-name{font-size:10px;line-height:17px}
+
+ .seat .muted{font-size:8px;line-height:12px}
+
+ .seat.bottom{left:24%;bottom:calc(var(--face-height) + 40px);width:88px}
+
+ .seat.bottom .avatar{width:58px;height:66px}
+
+ .seat.bottom .avatar .sprite{width:56px;height:56px}
+
+ .board-info{top:12px;left:14px;padding:6px 12px;gap:14px}
+
+ .board-info .tile{--tile-width:25px;--tile-height:34px;--tile-depth:8px}
+
+ .board-info .label{font-size:9px;line-height:12px}
+
+ .table-view .room-heading{display:none}
+
+ .table-view .topbar{top:12px;right:12px}
+
+ .rack.bottom{bottom:12px}
+
+ .action-tray{bottom:calc(var(--face-height) + 20px);gap:5px;width:38px;left:8px}
+
+ .action-tray.mahjong-actions button{height:32px;min-height:32px;width:38px;min-width:38px;font-size:13px}
+
+ .call-menu{right:max(14px,calc(50% - var(--face-width)*5.5 - 20px));bottom:calc(var(--face-height) + 22px);gap:10px}
+ .decision-button{flex-basis:86px;width:86px;height:86px}
+
+ .table-tools{right:12px;bottom:12px}
+
+ .table-tools button{font-size:11px;padding:8px}
+
+ .emote-bubble{width:84px;height:88px}
+
+ .emote-bubble .sprite{width:78px;height:78px}
+
+}
+
+
+
+@media(min-width:1600px){.table-world .pond-ring{transform:translate(-50%,-50%) scale(1.6)}}
+@media(max-width:1099px){.table-world .pond-ring{transform:translate(-50%,-50%) scale(.85)}}
+@media(max-width:600px){
+ .table-camera{perspective:520px;perspective-origin:50% 42%}
+ .table-world{top:42%;height:100%;transform:translate(-50%,-50%) rotateX(32deg)}
+ .table-world .pond-ring{transform:translate(-50%,-50%) scale(.44)}
+ .seat.left,.seat.right{top:15%}
+}
+@media(max-width:374px){.table-world .pond-ring{transform:translate(-50%,-50%) scale(.38)}}
+@media(max-height:600px) and (min-width:601px){
+ .table{--back-width:clamp(23px,min(3.2vw,6.4vh),48px)}
+ .table-world{height:120%}
+ .table-world .pond-ring{transform:translate(-50%,-50%) scale(.58)}
+}
+@media(max-height:359px) and (min-width:601px){
+ .action-tray{display:grid;grid-template-columns:repeat(2,44px);width:93px;bottom:12px}
+ .action-tray.mahjong-actions button{width:44px;min-width:44px;height:44px;min-height:44px}
+}
+
+
+.center-score{writing-mode:horizontal-tb;transform:none}
+.center-score.left small,.center-score.right small{font-size:14px;line-height:18px;margin-left:0}
+.meld-rack{position:absolute;width:0;height:0;transform-style:preserve-3d;transform-origin:0 0}
+.meld-rack.bottom{right:15%;top:74%}
+.meld-rack.left{left:15%;top:74%;transform:rotateZ(90deg)}
+.meld-rack.top{left:8%;top:13%;transform:rotateZ(180deg)}
+.meld-rack.right{right:8%;top:13%;transform:rotateZ(-90deg)}
+.meld-rack>.melds{--meld-width:24px;--meld-height:32px;--meld-depth:8px;position:absolute;right:0;bottom:0;width:max-content;display:flex;flex-direction:row-reverse;align-items:flex-end;gap:10px;transform-style:preserve-3d}
+.meld{position:relative;display:block;transform-style:preserve-3d}
+.meld.has-added{padding-top:calc(var(--meld-width) + 2px)}
+.meld>.tiles{align-items:flex-end;transform-style:preserve-3d}
+.melds .tile{--tile-width:var(--meld-width);--tile-height:var(--meld-height);--tile-depth:var(--meld-depth)}
+.meld-source{position:absolute;left:0;bottom:-12px;width:100%;color:#d1d0d6;font-size:8px;line-height:10px;white-space:nowrap;text-align:center}
+.tile.called-tile{width:var(--tile-height);height:var(--tile-width)}
+.table-world .tile.called-tile>.tile-model{top:50%;left:50%;transform:translate(-50%,-50%) rotateZ(90deg) translateZ(calc(var(--tile-depth)/2))}
+.table-world .tile.called-tile>.tile-model.tile-added{top:calc(50% - var(--tile-width) - 2px)}
+@media(max-width:600px){
+ .meld-rack.top{left:15%}
+ .meld-rack.right{right:15%}
+ .meld-rack>.melds{--meld-width:16px;--meld-height:22px;--meld-depth:6px;gap:6px}
+ .meld-source{font-size:7px;bottom:-10px}
+ .table-tools{bottom:calc(var(--face-height) + 38px);right:8px;flex-direction:row}
+ .table-tools [data-panel=characters]{display:none}
+ .table-tools [data-panel=emotes]{width:44px;padding:7px 0}
+}
+
+@media(max-width:1099px){.table-view #exit-test{display:none}}
+.win-streak{display:block;margin-top:9px;color:#a6f0ff;text-shadow:0 0 18px #46c6ff,2px 2px #182f50;animation:streak-hit var(--win-duration,1.6s) ease-out both}
+.win-streak-label{display:block;font-size:30px;font-weight:900;line-height:34px}.win-streak-english{display:block;font-size:14px;font-weight:800;letter-spacing:3px;line-height:20px}
+.streak-3{color:#e1b6ff;text-shadow:0 0 20px #b96bff,2px 2px #39234b}.streak-4,.streak-5{color:#ffe392;text-shadow:0 0 22px #ff7e37,2px 2px #64332b}
+@keyframes streak-hit{0%,16%{opacity:0;transform:scale(.5)}30%{opacity:1;transform:scale(1.2)}42%,82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.04)}}
+
+@media(prefers-reduced-motion:reduce){.win-streak{animation:none}}
+</style>
+<link rel="stylesheet" href="/dev/styles/interactions.wxss">
+<main id="app">
+  <header class="topbar"><div class="brand"><div class="brand-mark" aria-hidden="true">雀</div><div><div class="eyebrow">尖塔来客 · 好友场</div><h1>好友麻将</h1></div></div><div class="row"><button id="exit-test" class="ghost" hidden>结束测试</button><button id="settings" class="ghost" hidden aria-label="牌桌设置">设置</button><button id="lobby-toggle" class="ghost" hidden>大厅</button><div class="muted"><span class="online-dot"></span>本地试玩<br>108 张牌 · 仅限自摸</div></div></header>
+  <div id="lobby" class="lobby-grid">
+    <section class="panel join-panel" aria-label="加入牌桌">
+      <div><div class="eyebrow">邀三两好友，落座摸一圈</div><h2>今夜，开一桌。</h2></div>
+      <div><label for="name">你的牌桌昵称</label><div class="form-row"><div><input id="name" maxlength="32" placeholder="输入你的昵称" autocomplete="nickname"></div><button id="login" class="primary">创建试玩身份</button></div><span id="identity" class="muted" aria-live="polite"></span></div>
+      <div class="divider"></div>
+      <div class="form-row"><div><label for="code">好友房间号</label><input id="code" placeholder="输入八位房间号" maxlength="8" autocapitalize="characters" spellcheck="false"></div><button id="join">加入房间</button></div>
+      <div class="form-row"><div class="number"><label for="hands">每场局数</label><input id="hands" aria-label="每场局数" type="number" value="1" min="1"></div><button id="create" class="primary">创建房间</button><button id="history" class="ghost">历史牌谱</button></div>
+      <div class="form-row"><button id="test-mode" class="primary">单人测试</button><span class="muted">自动补齐三位机器人 · 有杠先杠，可碰就碰，其余随机出牌</span></div>
+    </section>
+    <section class="panel" aria-label="角色牌背选择"><div class="intro"><div><div class="eyebrow">四位旅者，四种心情</div><h2>选一位，陪你摸牌。</h2></div><span class="muted">角色牌背<br>专属表情</span></div><div id="characters" class="character-gallery"></div><div class="gallery-hint"><span id="selected-character" class="muted"></span><span class="muted">点击角色更换牌背</span></div></section>
+  </div>
+  <div id="room"></div>
+  <div id="win-effects" aria-live="polite"></div>
+  <div id="call-effects" aria-live="polite"></div>
+  <div id="interaction-effects" aria-live="polite"></div>
+  <div id="error" role="alert" aria-live="assertive"></div>
+  <details><summary>怎么玩 · 好友房试玩说明</summary><p>单人体验：创建试玩身份后点“单人测试”，自动补齐三位机器人，设置局数后点击“准备”开局。多人体验：打开四个浏览器标签页，分别创建试玩身份，再加入同一个房间。四人全部入座并点击“准备”后会自动开始对局。每位玩家只看得到自己的手牌，其他玩家的暗牌显示其专属角色牌背。</p><p>手动出牌：点牌选中，再点同一张牌打出。四个按钮是持续开关：“理”自动理牌，“和”自动胡牌，“鸣”免鸣（不吃碰杠），“切”自动摸切；同时开启“和、切”时先胡牌。关闭免鸣时，碰杠或过牌的选择会自动出现；手动胡牌使用单独的“自摸胡牌”。关闭“理”后可拖动排序。出牌直接显示在牌河；摸切移走单独的新牌，手切会在原手牌中短暂留空再合拢，所有玩家都能看到。点击牌桌右下角“表情”发送角色表情，气泡显示三秒，每三秒可发一次。结束后可以导出牌谱，并在本地验证牌山与结算。</p><p>试玩身份保留至当前标签页关闭。牌山校验码会在发牌前自动记录。</p></details>
+</main>
+<script src="/dev/lib/cosmetics.js"></script>
+<script src="/dev/lib/layout.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id),cosmetics=MahjongCosmetics,layout=MahjongLayout;
+let token=sessionStorage.getItem('token')||'',user=JSON.parse(sessionStorage.getItem('user')||'null'),room,watching=false,acknowledging=false;
+let selectedCharacter=cosmetics.character(sessionStorage.getItem('character')).id,panel='',emotePack='character',emoteTimer,showLobby=false,sortEnabled=true,selectedTile=null,manualOrder=[],draggedHandIndex=null,actionPending=false,emotePending=false,interactionPending=false,interactionTarget=null,resultVisible=true;
+let winEffect=null,winTimer,controlsPending=null,controlsSaving,confirmedControls={};
+const discardGaps=new Map(),discardTimers=new Map(),interactionSeen=new Set(),interactionTimers=new Map();
+const callSeen=new Set(),callTimers=new Map(),callUntil=new Map();
+let invitedRoom=new URLSearchParams(location.search).get('room')?.trim().toUpperCase()||'';
+if(!/^[A-Z0-9]{8}$/.test(invitedRoom))invitedRoom='';
+const escape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const id=()=>crypto.randomUUID();
+const labels={ack:'确认牌山',win:'自摸胡牌',pon:'碰',exposedKong:'明杠',concealedKong:'暗杠',addedKong:'补杠',float:'飘癞子',pass:'过',black:'黑摸',wildcard:'带癞自摸',jiahei:'夹黑'};
+const phases={commit:'等待确认牌山',own:'等待出牌',responses:'等待碰杠响应',finished:'本局结束'};
+const checkLabels={passed:'验证通过',unverified:'部分证据尚未验证',failed:'验证未通过',pass:'通过',fail:'未通过',unknown:'未验证'};
+const tileName=type=>type===null?'暗牌':'一二三四五六七八九'[type%9]+['万','条','饼'][Math.floor(type/9)];
+async function request(path,method='GET',data){const response=await fetch(path,{method,headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});const value=await response.json();if(!response.ok)throw new Error(value.error);return value;}
+function error(e){$('error').textContent=/[\u3400-\u9fff]/.test(e.message||'')?e.message:'操作失败，请刷新页面后重试。';}
+function run(fn){return Promise.resolve().then(fn).catch(error);}
+function characterAt(seat){return cosmetics.character(room?.characters?.[seat],seat);}
+function sprite(character,frame=0){return '<span class="sprite" aria-hidden="true" style="--frame-x:'+(-(frame%3)*100)+'%;--frame-y:'+(-Math.floor(frame/3)*100)+'%"><img alt="" src="'+character.sheet+'" draggable="false"></span>';}
+function characterChoices(){return cosmetics.characters.map(c=>'<button class="character-choice" style="--character:'+c.color+'" data-character="'+c.id+'" aria-label="选择'+c.name+'牌背" aria-pressed="'+(selectedCharacter===c.id)+'">'+sprite(c)+'<strong>'+c.name+'</strong><span class="muted">'+c.pose+'</span><span class="choice-mark">'+(selectedCharacter===c.id?'已选中':'')+'</span></button>').join('');}
+function tiles(ids,wild,seat,small=false,discards=false,slots=[]){
+  const h=room?.match?.hand,character=characterAt(seat);
+  return '<div class="tiles '+(small?'small':'')+'">'+ids.map((value,index)=>{
+    const slot=slots[index];
+    if(slot?.gap)return '<span class="tile discard-gap" data-gap="'+slot.key+'" style="'+slot.style+'" aria-hidden="true"></span>';
+    const tileId=slot?.faceDown?null:discards?value.id:value,type=tileId===null?null:Math.floor(tileId/4);
+    const name=tileName(type)+(type===wild?'（癞子）':'');
+    const action=!small&&seat===room.seat&&h?.actions.find(a=>a.tile===tileId&&['discard','float'].includes(a.kind));
+    const selected=!small&&seat===room.seat&&tileId===selectedTile;
+    const classes='tile '+(type===wild?'wild ':'')+(tileId===null?'hidden ':'')+(discards&&value.claimed?'claimed ':'')+(slot?.last?'latest ':'')+(selected?'selected ':'')+(slot?.called?'called-tile ':'');
+    const face=tileId===null?(seat===room.seat?sprite(character):''):'<img alt="" draggable="false" src="/assets/tiles/'+['Man','Sou','Pin'][Math.floor(type/9)]+(type%9+1)+'.png">';
+    const model=front=>'<span class="tile-face tile-front">'+front+'</span><span class="tile-face tile-back">'+sprite(character)+'</span><span class="tile-face tile-top"></span><span class="tile-face tile-base"></span><span class="tile-face tile-left"></span><span class="tile-face tile-right"></span>';
+    let contents='<span class="tile-model" aria-hidden="true">'+model(face)+'</span>';
+    if(slot?.addedId!==undefined){const t=Math.floor(slot.addedId/4);contents+='<span class="tile-model tile-added" aria-hidden="true">'+model('<img alt="" draggable="false" src="/assets/tiles/'+['Man','Sou','Pin'][Math.floor(t/9)]+(t%9+1)+'.png">')+'</span>';}
+    return '<'+(action?'button':'span')+' class="'+classes+'" style="--character:'+character.color+'" data-tile-id="'+(tileId===null?'':tileId)+'" data-hand-index="'+index+'" '+(action?'data-tile="'+tileId+'" '+(actionPending?'disabled ':'')+'aria-pressed="'+selected+'"':'role="img"')+' aria-label="'+name+'">'+contents+'</'+(action?'button':'span')+'>';
+  }).join('')+'</div>';
+}
+function meldsView(player,seat,wildcard){
+  const groups=player.melds.map(meld=>{
+    const view=layout.meldLayout(meld,seat),name=labels[meld.kind]||'副露';
+    const source=meld.kind==='concealedKong'?'暗杠':name+' · '+view.source;
+    const description=source+(meld.kind==='concealedKong'?'':' '+(room.match?.seats[meld.from]?.name||room.seats[meld.from]?.name||'牌友'));
+    return '<div class="meld '+(meld.kind==='addedKong'?'has-added':'')+'" data-from-seat="'+meld.from+'" data-source="'+view.relative+'" aria-label="'+escape(description)+'">'+tiles(view.tiles.map(t=>t.id),wildcard,seat,true,false,view.tiles)+'<span class="meld-source">'+source+'</span></div>';
+  }).join('');
+  return '<div class="melds">'+groups+(player.floated.length?'<div class="meld floated-meld">'+tiles(player.floated,wildcard,seat,true)+'<span class="meld-source">飘</span></div>':'')+'</div>';
+}
+function seatView(seat,h){
+  const player=room.seats[seat],c=characterAt(seat),position=['bottom','right','top','left'][(seat-room.seat+4)%4];
+  const emote=room.emotes?.[seat],emotion=emote&&cosmetics.emotion(emote.emote),visible=emotion&&Date.parse(emote.expiresAt)>Date.now();
+  const avatarTag=player&&seat!==room.seat?'button':'div',avatar='<'+avatarTag+' class="avatar" style="--character:'+c.color+'" '+(avatarTag==='button'?'data-avatar-target="'+seat+'" aria-label="与'+escape(player.name)+'互动"':'')+'>'+sprite(c)+'</'+avatarTag+'>';
+  return '<div class="seat '+position+(h?.phase==='own'&&h.actor===seat?' acting':'')+'" data-seat="'+seat+'">'+avatar+'<div><span class="seat-name">'+(h?.dealerSeat===seat?'<span class="dealer">庄</span>':'')+escape(player?player.name:'虚位以待')+'</span><div class="seat-score">'+(h?h.scores[seat]/2+' <small>分</small>':room.ready[seat]?'已准备':player?'已入座':'待入座')+'</div><div class="muted">'+c.name+(h?' · 已飘 '+h.floats[seat]+' 张':seat===room.seat?' · 你':'')+'</div></div>'+(visible?'<div class="emote-bubble" role="status" aria-label="'+escape(player?.name||'牌友')+'：'+emotion.name+'">'+(emotion.emoji?'<span class="common-emoji" aria-hidden="true">'+emotion.emoji+'</span>':sprite(cosmetics.character(emote.character),emotion.frame))+'<span class="emote-caption">'+emotion.name+'</span></div>':'')+'</div>';
+}
+function canInteract(){const h=room?.match?.hand;return Boolean(h&&h.phase!=='commit'&&room.seats[interactionTarget]&&interactionTarget!==room.seat&&(room.interactionRemaining??cosmetics.interactionLimit)>0&&!interactionPending);}
+function openInteraction(seat){
+  if(!Number.isInteger(seat)||seat===room?.seat||!room?.seats[seat])return;
+  interactionTarget=seat;panel='interaction';render();
+}
+function interactionPanel(showTargets=true){
+  const targets=room.seats.map((player,seat)=>({player,seat})).filter(target=>target.player&&target.seat!==room.seat);
+  if(!targets.some(target=>target.seat===interactionTarget))interactionTarget=targets[0]?.seat??null;
+  return (showTargets?'<div class="interaction-targets" role="group" aria-label="选择互动玩家">'+targets.map(({player,seat})=>'<button data-interaction-target="'+seat+'" aria-pressed="'+(seat===interactionTarget)+'">'+escape(player.name)+'</button>').join('')+'</div>':'')+'<p class="muted">'+(room.match?.hand&&room.match.hand.phase!=='commit'?'本局剩余 '+(room.interactionRemaining??cosmetics.interactionLimit)+' / '+cosmetics.interactionLimit+' 次':'发牌后可使用互动道具')+'</p><div class="interaction-grid">'+cosmetics.interactions.map(effect=>'<button data-interaction="'+effect.id+'" aria-label="'+effect.name+'" '+(canInteract()?'':'disabled')+'><span class="common-emoji" aria-hidden="true">'+effect.emoji+'</span><span>'+effect.name+'</span></button>').join('')+'</div>';
+}
+function emotePanel(character){
+  const tabs='<div class="emote-tabs" role="group" aria-label="表情分类">'+[['character','角色表情'],['common','通用表情'],['interaction','互动道具']].map(([key,name])=>'<button data-emote-pack="'+key+'" aria-pressed="'+(emotePack===key)+'">'+name+'</button>').join('')+'</div>';
+  if(emotePack==='interaction')return tabs+interactionPanel();
+  return tabs+'<div class="emote-grid '+(emotePack==='common'?'common':'')+'">'+(emotePack==='common'?cosmetics.commonEmotions:cosmetics.emotions).map(e=>'<button class="emote-option" data-emote="'+e.id+'" aria-label="发送'+e.name+'表情" '+(canSendEmote()?'':'disabled')+'>'+(e.emoji?'<span class="common-emoji" aria-hidden="true">'+e.emoji+'</span>':sprite(character,e.frame))+'<span>'+e.name+'</span></button>').join('')+'</div>';
+}
+function settlementView(hand){
+  const rows=layout.settlementLayout(hand);if(!rows)return '';
+  const names=room.match.seats,complete=room.match.status==='complete',badge=layout.streakBadge(room.match.winStreak?.count);
+  let html='<section class="settlement"><div class="settlement-heading"><strong>'+(complete?'大局结算':'小局结算')+'</strong><button data-result-close>查看牌桌</button></div>';
+  if(complete)html+='<section class="match-final"><h3>大局结束 · 最终分数</h3><div class="final-scores">'+rows.map(row=>'<div><span>'+escape(names[row.seat].name)+'</span><strong>'+row.total+' <small>分</small></strong></div>').join('')+'</div></section>';
+  html+='<p>第 '+hand.handNo+' / '+room.match.settings.handsPerMatch+' 小局 · '+escape(hand.result.kind==='draw'?'流局':names[hand.result.winner].name+' · '+(labels[hand.result.classification]||'胡牌'))+(badge?' · '+badge.label:'')+'</p><div class="settlement-players">';
+  html+=rows.map(row=>{const player=hand.players[row.seat];return '<section class="settlement-player"><div class="settlement-score"><b>'+escape(names[row.seat].name)+'</b><span class="'+(row.deltaUnits>0?'score-gain':row.deltaUnits<0?'score-loss':'')+'">本局 '+row.delta+' 分</span><span>累计 '+row.total+' 分</span></div><div class="settlement-cards"><div class="settlement-group"><small>手牌</small>'+tiles(row.hand,hand.wildcardType,row.seat,true)+'</div>'+player.melds.map(meld=>'<div class="settlement-group"><small>'+labels[meld.kind]+'</small>'+tiles(meld.tiles,hand.wildcardType,row.seat,true)+'</div>').join('')+(player.floated.length?'<div class="settlement-group"><small>已飘</small>'+tiles(player.floated,hand.wildcardType,row.seat,true)+'</div>':'')+'</div></section>';}).join('');
+  return html+'</div></section>';
+}
+function handTiles(seat,h){
+  let hand=h?h.players[seat].hand.slice():Array(10).fill(null);
+  if(seat===room.seat&&h){
+    const latest=hand.includes(h.lastDraw)?h.lastDraw:null;
+    hand=layout.arrangeHand(hand,h.wildcardType,latest,sortEnabled,manualOrder);
+  }
+  const drawnIndex=h&&(seat===room.seat?hand.includes(h.lastDraw):h.drawSeat===seat)?hand.length-1:-1;
+  const faces=layout.withDiscardGaps(hand.map((id,index)=>({id,last:index===drawnIndex})),[...discardGaps.values()].filter(gap=>gap.seat===seat));
+  return tiles(faces.map(face=>face.id),h?.wildcardType,seat,seat!==room.seat||!h,false,faces);
+}
+function decisionButtons(h){
+  const choices=h.actions.filter(a=>a.kind==='win'||!room.controls?.skipCalls&&['pon','exposedKong','concealedKong','addedKong','pass'].includes(a.kind)).sort((a,b)=>layout.decisionLayout(a).priority-layout.decisionLayout(b).priority);
+  return choices.map(a=>{
+    const view=layout.decisionLayout(a,h.lastDraw),name=labels[a.kind]+(a.type===undefined?'':'：'+tileName(a.type));
+    const preview=view.preview.map(id=>{const type=Math.floor(id/4);return '<img alt="" src="/assets/tiles/'+['Man','Sou','Pin'][Math.floor(type/9)]+(type%9+1)+'.png">';}).join('');
+    return '<button class="decision-button '+view.variant+'" data-action="'+escape(JSON.stringify(a))+'" aria-label="'+name+'" '+(actionPending?'disabled':'')+'><span class="decision-plate" aria-hidden="true"></span><span class="decision-preview" aria-hidden="true">'+preview+'</span><span class="decision-glyph" aria-hidden="true">'+view.glyph+'</span><span class="decision-note">'+name+'</span></button>';
+  }).join('');
+}
+function tableContents(h){
+  let html=Array.from({length:4},(_,i)=>seatView(i,h)).join(''),ponds='',racks='',meldRacks='';
+  if(h)html+='<div class="board-info" aria-label="朝天与癞子"><div><span class="label">朝天</span>'+tiles([h.indicatorId],null,-1)+'</div><div><span class="label">癞子</span>'+tiles([h.wildcardType*4],h.wildcardType,-1)+'</div></div>';
+  for(let seat=0;seat<4;seat++){
+    const position=['bottom','right','top','left'][(seat-room.seat+4)%4],p=h?.players[seat];
+    const rack='<div class="rack '+position+'" data-seat="'+seat+'">'+handTiles(seat,h)+'</div>';
+    if(seat===room.seat)html+=rack;else racks+=rack;
+    if(p&&(p.melds.length||p.floated.length))meldRacks+='<div class="meld-rack '+position+'" data-seat="'+seat+'">'+meldsView(p,seat,h.wildcardType)+'</div>';
+    if(p)ponds+='<div class="pond '+position+'" aria-label="'+escape(room.seats[seat]?.name||'牌友')+'的牌河">'+tiles(p.discards,h.wildcardType,seat,true,true)+'</div>';
+  }
+  const scores=h?['bottom','right','top','left'].map((position,offset)=>{const seat=(room.seat+offset)%4;return '<span class="center-score '+position+(h.actor===seat&&h.phase==='own'?' acting':'')+'" aria-label="'+escape(room.seats[seat]?.name||'牌友')+'，'+h.scores[seat]/2+' 分">'+h.scores[seat]/2+'<small>分</small></span>';}).join(''):'';
+  html+='<div class="table-camera"><div class="table-world"><div class="table-surface" aria-hidden="true"></div>'+racks+meldRacks+'<div class="pond-ring">'+ponds+'<div class="center-square">'+scores+'<div class="center-core"><strong class="hand-progress">'+(h?'第 '+h.handNo+' 局':'好友场')+'</strong><span class="hand-progress-caption">'+(h?'共 '+room.match.settings.handsPerMatch+' 局':'等你落座')+'</span><span class="center-remaining">'+(h?'余 '+h.remaining:'四人麻将')+'</span><span class="center-status">'+(h?phases[h.phase]+(h.phase==='commit'?' '+h.acknowledgements.filter(Boolean).length+'/4':''):'准备后自动开始')+'</span></div></div></div></div></div>';
+  if(!h)html+='<div class="ready-panel">'+(room.ownerId===user?.id?'<input class="room-hands" data-room-hands type="number" min="1" value="'+room.settings.handsPerMatch+'" aria-label="每场局数"><button data-room-settings>设置局数</button>':'')+'<button data-kind="ready" class="primary">'+(room.ready[room.seat]?'取消准备':'准备')+'</button>'+(room.testMode?'':'<button data-share>邀请好友</button>')+'<span class="muted">'+room.seats.filter(Boolean).length+' / 4 人入座 · '+room.ready.filter(Boolean).length+' 人准备 · 四人准备好后自动开始</span></div>';
+  if(h){
+    const controls=room.controls||{};
+    html+='<div class="action-tray mahjong-actions"><button data-sort class="'+(sortEnabled?'active':'')+'" aria-label="自动理牌" title="自动理牌" aria-pressed="'+sortEnabled+'" '+(actionPending?'disabled':'')+'>理</button>'+[['autoWin','和','自动胡牌'],['skipCalls','鸣','免鸣：不吃碰杠'],['autoCut','切','自动摸切']].map(([key,label,title])=>'<button data-control="'+key+'" class="'+(controls[key]?'active':'')+'" aria-label="'+escape(title)+'" title="'+title+'" aria-pressed="'+!!controls[key]+'" '+(actionPending||h.phase==='finished'?'disabled':'')+'>'+label+'</button>').join('')+'</div>';
+    html+='<div class="call-menu" role="group" aria-label="胡牌与鸣牌选择">'+decisionButtons(h)+'</div>';
+  }
+  return html+'<div class="table-tools">'+(h?.phase==='finished'?'<button data-result-open>本局结算</button>':'')+'<button data-panel="characters" class="ghost">换牌背</button><button data-panel="emotes" class="primary" aria-expanded="'+(panel==='emotes')+'">表情</button></div>';
+}
+function render(){
+  clearTimeout(emoteTimer);
+  if(!room){clearWinEffect();clearCalls();clearDiscardGaps();clearInteractions();}
+  $('app').className=room&&!showLobby?'table-view':'';$('settings').hidden=!room;$('exit-test').hidden=!room?.testMode;
+  if(room)selectedCharacter=characterAt(room.seat).id;
+  $('identity').textContent=user?user.name+' · 已就绪':'每个标签页可创建一个独立身份';
+  $('lobby').hidden=Boolean(room)&&!showLobby;$('lobby-toggle').hidden=!room;$('lobby-toggle').textContent=showLobby?'收起大厅':'大厅';$('lobby-toggle').ariaExpanded=String(showLobby);
+  $('characters').innerHTML=characterChoices();$('selected-character').textContent='当前牌背：'+cosmetics.character(selectedCharacter).name;
+  for(const key of ['join','create','test-mode','history'])$(key).disabled=!user;
+  let html='';
+  if(room){
+    $('code').value=room.code;const h=room.match?.hand;
+    html='<div class="room-heading"><div><strong>'+(room.testMode?'单人测试':'好友房')+' · '+room.code+'</strong><div class="room-meta">每场 '+room.settings.handsPerMatch+' 局'+(h?' · 第 '+h.handNo+' 局':' · 等待朋友加入')+'</div></div><span class="muted">'+(h?.phase==='own'?'轮到 '+escape(room.seats[h.actor]?.name||'牌友')+' 操作':'四位旅者，一桌好牌')+'</span></div><section class="table '+(h?'has-match':'')+'" aria-label="四人麻将牌桌">'+tableContents(h)+'</section>';
+    if(h){html+='<div class="table-bottom"><div class="payments">'+h.payments.slice(-6).map(p=>escape(room.match.seats[p.payer].name)+' → '+escape(room.match.seats[p.recipient].name)+'：'+p.amount/2+' 分 · '+(labels[p.kind]||'结算')).join('<br>')+'</div><details><summary>牌山校验码</summary><p class="hash">'+h.wallCode+'</p></details></div>';
+      if(h.phase==='finished'&&!winEffect&&resultVisible)html+='<div class="result">'+settlementView(h)+'<div class="settlement-actions"><button data-command="verify">本地验证</button><button data-command="export">导出牌谱</button>'+(room.match.status==='active'?'<button data-kind="continue" class="primary" '+(room.match.continueReady[room.seat]?'disabled':'')+'>'+(room.match.continueReady[room.seat]?'等待朋友继续':'下一局')+'</button>':'<span>本场结束 · 已准备 '+room.ready.filter(Boolean).length+' / 4</span><button data-kind="ready" class="primary">'+(room.ready[room.seat]?'取消准备':'再来一局')+'</button>')+'</div><pre id="verification"></pre></div>';
+    }
+    if(panel){
+      const c=characterAt(room.seat),isSettings=panel==='settings';
+      const title=isSettings?'牌桌设置':panel==='interaction'?'与'+(room.seats[interactionTarget]?.name||'牌友')+'互动':panel==='emotes'?'选择表情包':'选择角色牌背';
+      let content=panel==='interaction'?interactionPanel(false):panel==='emotes'?emotePanel(c):'<div class="character-gallery">'+characterChoices()+'</div>';
+      if(isSettings)content='<div class="settings-options"><div class="row"><button data-panel="characters">更换牌背</button><button data-panel="emotes">角色表情</button></div><button data-sort aria-pressed="'+sortEnabled+'">自动理牌：'+(sortEnabled?'开启':'关闭')+'</button>'+(h?'<details><summary>牌山校验码</summary><p class="hash">'+h.wallCode+'</p></details><details><summary>本局收支</summary><div class="payments">'+(h.payments.map(p=>escape(room.match.seats[p.payer].name)+' → '+escape(room.match.seats[p.recipient].name)+'：'+p.amount/2+' 分 · '+(labels[p.kind]||'结算')).join('<br>')||'本局暂无收支')+'</div></details>':'')+'<details><summary>操作说明</summary><p>点牌选中，再点同一张牌打出。“理”自动理牌，“和”自动胡牌，“鸣”免鸣（不吃碰杠），“切”自动摸切；同时开启“和、切”时先胡牌。碰杠或过牌、手动自摸使用另行出现的选择。起手和碰后没有新摸牌时仍需手动出牌；摸到癞子时依法飘牌，不能飘时等待手动切普通牌。关闭“理”后可拖动排序。</p></details><span class="muted">房间 '+room.code+' · 每场 '+room.settings.handsPerMatch+' 局</span></div>';
+      if(isSettings)content+=room.testMode?'<button data-exit-test>结束测试</button><p class="muted">机器人有杠先杠、可碰就碰，其余随机出牌；摸到癞子时按规则飘，不能飘时随机打出普通牌。机器人不自动胡牌。结束测试会放弃未完成的本场进度。</p>':'<button data-share>邀请好友 · 复制链接</button>';
+      html+='<section class="popover" role="region" aria-label="'+escape(title)+'"><div class="intro"><div><h3>'+escape(title)+'</h3><span class="muted">'+(isSettings?'好友场 · 仅限自摸':panel==='interaction'?'每人每局 '+cosmetics.interactionLimit+' 次 · 两种道具共用':panel==='emotes'?(emotePack==='interaction'?'每人每局 '+cosmetics.interactionLimit+' 次 · 两种道具共用':'同桌可见 · 显示三秒 · 每三秒可发送一次'):'牌背与头像随角色一起更换')+'</span></div><button data-panel="" aria-label="关闭面板">×</button></div>'+content+'</section>';
+    }
+    const expires=(room.emotes||[]).filter(Boolean).map(e=>Date.parse(e.expiresAt)).filter(t=>t>Date.now());
+    if(expires.length)emoteTimer=setTimeout(render,Math.min(...expires)-Date.now()+20);
+  }
+  $('room').innerHTML=html;
+  if(room)renderInteractions();
+  document.querySelectorAll('[data-character]').forEach(button=>button.onclick=()=>run(async()=>{selectedCharacter=button.dataset.character;sessionStorage.setItem('character',selectedCharacter);if(room)await social('appearance',{character:selectedCharacter});else render();}));
+  document.querySelectorAll('[data-avatar-target]').forEach(button=>button.onclick=()=>openInteraction(Number(button.dataset.avatarTarget)));
+  document.querySelectorAll('[data-result-close]').forEach(button=>button.onclick=()=>{resultVisible=false;render();});
+  document.querySelectorAll('[data-result-open]').forEach(button=>button.onclick=()=>{resultVisible=true;render();});
+  document.querySelectorAll('[data-panel]').forEach(button=>button.onclick=()=>{panel=panel===button.dataset.panel?'':button.dataset.panel;render();});
+  document.querySelectorAll('[data-emote-pack]').forEach(button=>button.onclick=()=>{emotePack=button.dataset.emotePack;render();});
+  document.querySelectorAll('[data-exit-test]').forEach(button=>button.onclick=()=>$('exit-test').onclick());
+  document.querySelectorAll('[data-share]').forEach(button=>button.onclick=()=>run(async()=>{const link=location.origin+location.pathname+'?room='+room.code;if(navigator.clipboard){try{await navigator.clipboard.writeText(link);button.textContent='邀请链接已复制';return;}catch{}}prompt('复制邀请链接发送给朋友',link);}));
+  document.querySelectorAll('[data-interaction-target]').forEach(button=>button.onclick=()=>{interactionTarget=Number(button.dataset.interactionTarget);render();});
+  document.querySelectorAll('[data-interaction]').forEach(button=>button.onclick=()=>run(()=>sendInteraction(button.dataset.interaction)));
+  document.querySelectorAll('[data-emote]').forEach(button=>button.onclick=()=>run(()=>sendEmote(button.dataset.emote)));
+  document.querySelectorAll('[data-kind]').forEach(button=>button.onclick=()=>run(()=>send({kind:button.dataset.kind,...(button.dataset.kind==='ready'?{ready:!room.ready[room.seat]}:{})})));
+  document.querySelectorAll('[data-room-settings]').forEach(button=>button.onclick=()=>run(()=>send({kind:'settings',handsPerMatch:Number(document.querySelector('[data-room-hands]').value)})));
+  bindDecisions();bindHand();
+  document.querySelectorAll('[data-sort]').forEach(button=>button.onclick=toggleSort);
+  document.querySelectorAll('[data-control]').forEach(button=>button.onclick=()=>run(()=>toggleControl(button.dataset.control)));
+  document.querySelectorAll('[data-command]').forEach(button=>button.onclick=()=>run(async()=>{const match=await request('/api/matches/'+room.match.id);if(button.dataset.command==='export'){const url=URL.createObjectURL(new Blob([JSON.stringify(match,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='牌谱-'+match.id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}else{const verifier=await loadVerifier();const hand=match.hands[match.hands.length-1];const report=verifier.verifyHand(hand,localStorage.getItem('commit_'+hand.matchId+'_'+hand.handNo));$('verification').textContent=checkLabels[report.status]+'\n'+report.checks.map(check=>checkLabels[check.status]+'｜'+check.name+'：'+check.detail).join('\n');}}));
+}
+function bindDecisions(){document.querySelectorAll('[data-action]').forEach(button=>button.onclick=()=>{if(actionPending)return;selectedTile=null;run(()=>send(JSON.parse(button.dataset.action)));});}
+function bindHand(){
+  document.querySelectorAll('.rack.bottom [data-tile]').forEach(button=>button.onclick=()=>run(()=>selectTile(Number(button.dataset.tile))));
+  const handTiles=[...document.querySelectorAll('.rack.bottom>.tiles>.tile:not(.discard-gap)')];
+  if(!sortEnabled&&!actionPending&&room&&room.match&&room.match.hand){
+    handTiles.forEach((tile,index)=>{
+      if(tile.classList.contains('latest')){tile.draggable=false;return;}
+      tile.draggable=true;
+      tile.addEventListener('dragstart',event=>{draggedHandIndex=index;if(event.dataTransfer){event.dataTransfer.effectAllowed='move';event.dataTransfer.setData('text/plain',String(index));}});
+      tile.addEventListener('dragover',event=>event.preventDefault());
+      tile.addEventListener('drop',event=>{
+        event.preventDefault();
+        if(draggedHandIndex===null||draggedHandIndex===index)return;
+        const ids=handTiles.map(item=>Number(item.dataset.tileId));
+        const [moved]=ids.splice(draggedHandIndex,1);
+        ids.splice(index>draggedHandIndex?index-1:index,0,moved);
+        manualOrder=ids;draggedHandIndex=null;selectedTile=null;render();
+      });
+    });
+  }
+}
+function refreshControls(){
+  if(!document.querySelector('.action-tray')){render();return;}
+  document.querySelectorAll('[data-sort]').forEach(button=>{button.classList.toggle('active',sortEnabled);button.setAttribute('aria-pressed',String(sortEnabled));if(!button.closest('.action-tray'))button.textContent='自动理牌：'+(sortEnabled?'开启':'关闭');});
+  document.querySelectorAll('[data-control]').forEach(button=>{const active=!!room.controls?.[button.dataset.control];button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));});
+  if(selectedTile===null)document.querySelectorAll('.rack.bottom .tile.selected').forEach(tile=>{tile.classList.remove('selected');tile.setAttribute('aria-pressed','false');});
+  const menu=document.querySelector('.call-menu');if(menu){menu.innerHTML=decisionButtons(room.match.hand);bindDecisions();}
+}
+function toggleSort(){
+  if(actionPending)return;
+  sortEnabled=!sortEnabled;selectedTile=null;
+  const rack=document.querySelector('.rack.bottom');
+  if(rack&&room.match){rack.innerHTML=handTiles(room.seat,room.match.hand);bindHand();refreshControls();}else render();
+}
+function clearWinEffect(){clearTimeout(winTimer);winEffect=null;$('win-effects').innerHTML='';}
+function clearCalls(){for(const timer of callTimers.values())clearTimeout(timer);callTimers.clear();callSeen.clear();callUntil.clear();$('call-effects').innerHTML='';}
+function renderCalls(){
+  for(const notice of room.callNotices||[]){
+    const now=Date.now(),remaining=Date.parse(notice.expiresAt)-now;
+    if(remaining<=0||callSeen.has(notice.id))continue;
+    callSeen.add(notice.id);
+    const position=['bottom','right','top','left'][(notice.seat-room.seat+4)%4],key='call-'+notice.id;
+    const delay=Math.max(0,(callUntil.get(notice.seat)||0)-now);callUntil.set(notice.seat,now+delay+1500);
+    const show=()=>{
+      $('call-effects').insertAdjacentHTML('beforeend','<div id="'+escape(key)+'" class="call-flash '+position+'" role="status">'+escape(notice.label)+'</div>');
+      callTimers.set(notice.id,setTimeout(()=>{document.getElementById(key)?.remove();callTimers.delete(notice.id);},1500));
+    };
+    if(delay)callTimers.set(notice.id,setTimeout(show,delay));else show();
+  }
+}
+function clearDiscardGaps(){for(const timer of discardTimers.values())clearTimeout(timer);discardTimers.clear();discardGaps.clear();}
+function addDiscardGaps(batch){
+  const cuts=batch.filter(motion=>!motion.tsumogiri),now=Date.now();
+  cuts.forEach((motion,index)=>{
+    const delay=index*Math.min(80,600/cuts.length);
+    discardGaps.set(motion.seq,{...motion,startedAt:now+delay});
+    discardTimers.set(motion.seq,setTimeout(()=>{discardGaps.delete(motion.seq);discardTimers.delete(motion.seq);render();},delay+layout.DISCARD_GAP_MS));
+  });
+}
+function playWinEffect(next){
+  clearWinEffect();const hand=next.match.hand;
+  winEffect=hand.matchId+':'+hand.handNo;
+  const winner=next.match.seats[hand.result.winner].name,kind=labels[hand.result.classification]||'自摸胡牌';
+  const badge=layout.streakBadge(next.match.winStreak?.count),duration=badge?2200:1600;
+  $('win-effects').innerHTML='<div class="win-celebration" style="--win-duration:'+duration+'ms" role="status" aria-label="'+escape(winner+' · 自摸 · '+kind)+'"><div class="win-rays" aria-hidden="true"></div><div class="win-halo" aria-hidden="true"></div>'+Array.from({length:12},(_,i)=>'<span class="win-spark" aria-hidden="true" style="transform:rotate('+i*30+'deg)"><i></i></span>').join('')+'<div class="win-ribbon" aria-hidden="true"><span class="win-winner">'+escape(winner)+'</span><strong>自摸</strong><span class="win-kind">'+kind+'</span>'+(badge?'<span class="win-streak streak-'+badge.level+'"><span class="win-streak-label">'+badge.label+'</span><span class="win-streak-english">'+badge.english+'</span></span>':'')+'</div></div>';
+  winTimer=setTimeout(()=>{clearWinEffect();render();},duration);
+}
+function updateRoom(next){
+  if(!room||room.code!==next.code||next.revision<room.revision)return;
+  const previousHand=room.match&&room.match.hand,nextHand=next.match&&next.match.hand;
+  confirmedControls={...next.controls};
+  if(controlsPending){
+    if(!nextHand||nextHand.phase==='finished'||nextHand.matchId!==controlsPending.matchId||nextHand.handNo!==controlsPending.handNo)controlsPending=null;
+    else next={...next,controls:{...next.controls,...controlsPending.values}};
+  }
+  const {controls:oldControls,revision:oldRevision,callNotices:oldCalls,...previousView}=room;
+  const {controls:newControls,revision:newRevision,callNotices:newCalls,...nextView}=next;
+  if(JSON.stringify(previousView)===JSON.stringify(nextView)){room=next;refreshControls();renderCalls();return;}
+  const batch=layout.discardTransitions(previousHand,nextHand,room.seat,sortEnabled,manualOrder);
+  if(!previousHand||!nextHand||previousHand.matchId!==nextHand.matchId||previousHand.handNo!==nextHand.handNo){manualOrder=[];selectedTile=null;resultVisible=true;clearWinEffect();clearCalls();clearDiscardGaps();clearInteractions();}
+  else{
+    if(previousHand.phase!=='finished'&&nextHand.phase==='finished'&&nextHand.result?.kind==='win')playWinEffect(next);
+    if(previousHand.phase!==nextHand.phase||previousHand.actor!==nextHand.actor||previousHand.lastDraw!==nextHand.lastDraw)selectedTile=null;
+  }
+  addDiscardGaps(batch);room=next;render();renderCalls();
+}
+function clearInteractions(){for(const timer of interactionTimers.values())clearTimeout(timer);interactionTimers.clear();interactionSeen.clear();$('interaction-effects').innerHTML='';}
+function renderInteractions(){
+  for(const event of room.interactions||[]){
+    const key=event.playerId+':'+event.id;if(interactionSeen.has(key))continue;
+    const source=document.querySelector('.seat[data-seat="'+event.from+'"] .avatar'),target=document.querySelector('.seat[data-seat="'+event.target+'"] .avatar');
+    const motion=layout.interactionLayout(event,source&&source.getBoundingClientRect(),target&&target.getBoundingClientRect());
+    if(!motion)continue;
+    const effect=cosmetics.interactions.find(effect=>effect.id===event.effect);if(!effect)continue;
+    interactionSeen.add(key);
+    const description=(room.seats[event.from]?.name||'牌友')+'向'+(room.seats[event.target]?.name||'牌友')+effect.name;
+    const artwork=effect.id==='water'?'<span class="water-bucket"><span class="bucket-icon"><i class="bucket-handle"></i><i class="bucket-body"></i><i class="bucket-water"></i></span></span><span class="water-stream"></span><span class="water-cube"><i class="cube-eye left"></i><i class="cube-eye right"></i><i class="cube-mouth"></i></span>':'<span class="tomato-projectile"><i class="tomato-ball"></i></span><span class="tomato-impact"><i class="tomato-burst"></i><i class="tomato-splat"></i>'+motion.pieces.map(piece=>'<i class="tomato-piece" style="'+piece.style+'"></i>').join('')+'</span>';
+    $('interaction-effects').insertAdjacentHTML('beforeend','<div id="interaction-'+event.playerId+'-'+event.id+'" class="interaction-effect '+effect.id+'" style="'+motion.style+'" role="status" aria-label="'+escape(description)+'"><span aria-hidden="true">'+artwork+'</span></div>');
+    interactionTimers.set(key,setTimeout(()=>{document.getElementById('interaction-'+event.playerId+'-'+event.id)?.remove();interactionTimers.delete(key);},motion.remaining));
+  }
+}
+async function sendInteraction(effect){
+  if(!canInteract())return;
+  const hand=room.match.hand,target=interactionTarget;interactionPending=true;render();
+  try{await social('interactions',{id:id(),effect,target,matchId:hand.matchId,handNo:hand.handNo});}
+  finally{interactionPending=false;render();}
+}
+function canSendEmote(){return Boolean(room)&&!emotePending&&!(Date.parse(room.emotes?.[room.seat]?.expiresAt)>Date.now());}
+async function sendEmote(emote){
+  if(!canSendEmote())return;
+  emotePending=true;render();
+  try{await social('emotes',{id:id(),emote});panel='';}
+  finally{emotePending=false;render();}
+}
+async function social(operation,data){const current=room,auth=token;const next=await request('/api/rooms/'+current.code+'/'+operation,'POST',data);if(auth===token)updateRoom(next);$('error').textContent='';}
+async function send(action){
+  const lock=action.kind!=='ack';if(lock&&actionPending)return;
+  const current=room,auth=token,h=current.match&&current.match.hand;
+  if(lock){actionPending=true;render();}
+  try{const next=await request('/api/rooms/'+current.code+'/commands','POST',{id:id(),expectedRevision:current.revision,...(h?{matchId:h.matchId,handNo:h.handNo}:{}),...action,...(action.kind==='ready'?{matchId:current.matchId||h?.matchId,handsPerMatch:current.settings.handsPerMatch}:{})});if(token!==auth)return;updateRoom(next);$('error').textContent='';}
+  catch(e){if(token!==auth||!room||room.code!==current.code)return;const next=await request('/api/rooms/'+current.code);if(token===auth)updateRoom(next);throw e;}
+  finally{if(lock){actionPending=false;render();}}
+}
+async function selectTile(tile){
+  if(actionPending)return;
+  const action=room?.match?.hand.actions.find(a=>a.tile===tile&&['discard','float'].includes(a.kind));if(!action)return;
+  if(selectedTile===tile)await send(action);else{selectedTile=tile;render();}
+}
+async function toggleControl(key){
+  if(actionPending||!room||room.match?.hand.phase==='finished')return;
+  const hand=room.match.hand,value=!room.controls?.[key];
+  if(!controlsPending)controlsPending={code:room.code,matchId:hand.matchId,handNo:hand.handNo,values:{}};
+  controlsPending.values[key]=value;
+  room={...room,controls:{...room.controls,[key]:value}};selectedTile=null;refreshControls();
+  if(!controlsSaving)controlsSaving=saveControls(token).finally(()=>{controlsSaving=null;});
+  return controlsSaving;
+}
+async function saveControls(auth){
+  while(controlsPending&&token===auth){
+    const pending=controlsPending,values={...pending.values};
+    try{
+      const next=await request('/api/rooms/'+pending.code+'/controls','PATCH',{...values,matchId:pending.matchId,handNo:pending.handNo});
+      if(token!==auth||room?.code!==pending.code)return;
+      if(controlsPending===pending){for(const key of Object.keys(values))if(pending.values[key]===values[key])delete pending.values[key];if(!Object.keys(pending.values).length)controlsPending=null;}
+      updateRoom(next);$('error').textContent='';
+    }catch(e){
+      if(token!==auth||room?.code!==pending.code)return;
+      if(controlsPending===pending){controlsPending=null;room={...room,controls:{...confirmedControls}};refreshControls();}
+      try{const next=await request('/api/rooms/'+pending.code);if(token===auth)updateRoom(next);}catch{}
+      if(controlsPending&&controlsPending!==pending)continue;
+      throw e;
+    }
+  }
+}
+async function watch(){if(watching)return;watching=true;while(room){const current=room,auth=token;try{const next=await request('/api/rooms/'+current.code+'?after='+current.revision);if(token!==auth)continue;updateRoom(next);if(room&&room.code===current.code)await acknowledge();}catch(e){if(token===auth&&room&&room.code===current.code){error(e);await new Promise(resolve=>setTimeout(resolve,2000));}}}watching=false;}
+async function acknowledge(){const h=room&&room.match&&room.match.hand;if(!h||h.phase!=='commit'||h.acknowledgements[room.seat]||acknowledging)return;const key='commit_'+h.matchId+'_'+h.handNo;const old=localStorage.getItem(key);if(old&&old!==h.wallCode)throw new Error('牌山校验码发生变化，已停止确认本局。');localStorage.setItem(key,h.wallCode);acknowledging=true;try{await send({kind:'ack',code:h.wallCode});}finally{acknowledging=false;}}
+let verifierPromise;
+async function loadVerifier(){if(verifierPromise)return verifierPromise;verifierPromise=(async()=>{const names=['tiles','rules','shuffle','engine','replay','vendor/sha256'];const sources={};await Promise.all(names.map(async name=>{sources[name]=await(await fetch('/dev/lib/'+name+'.js')).text();}));const cache={};function load(name){if(cache[name])return cache[name].exports;const module={exports:{}};cache[name]=module;new Function('module','exports','require',sources[name])(module,module.exports,target=>load(target.replace(/^\.\//,'')));return module.exports;}return load('replay');})();return verifierPromise;}
+async function enterRoom(next){resultVisible=true;clearWinEffect();clearCalls();clearDiscardGaps();clearInteractions();controlsPending=null;confirmedControls={...next.controls};interactionTarget=null;manualOrder=[];selectedTile=null;sortEnabled=true;room=next;sessionStorage.setItem('room',room.code);invitedRoom='';history.replaceState(null,'',location.pathname+'?room='+room.code);try{const preferred=sessionStorage.getItem('character');if(preferred)await social('appearance',{character:preferred});}finally{render();renderCalls();watch();}await acknowledge();}
+async function joinInvitation(){await enterRoom(await request('/api/rooms/'+invitedRoom+'/join','POST',{id:id()}));}
+$('login').onclick=()=>run(async()=>{const result=await request('/api/login/dev','POST',{name:$('name').value||'牌友'});token=result.token;user=result.user;room=null;panel='';sessionStorage.setItem('token',token);sessionStorage.setItem('user',JSON.stringify(user));render();if(invitedRoom)await joinInvitation();});
+$('create').onclick=()=>run(async()=>enterRoom(await request('/api/rooms','POST',{handsPerMatch:Number($('hands').value)})));
+$('test-mode').onclick=()=>run(async()=>enterRoom(await request('/api/rooms','POST',{handsPerMatch:Number($('hands').value),testMode:true})));
+$('exit-test').onclick=()=>run(async()=>{const current=room;await request('/api/rooms/'+current.code+'/commands','POST',{id:id(),kind:'leave',expectedRevision:current.revision});room=null;panel='';selectedTile=null;manualOrder=[];sessionStorage.removeItem('room');history.replaceState(null,'',location.pathname);$('error').textContent='';render();});
+$('join').onclick=()=>run(async()=>enterRoom(await request('/api/rooms/'+$('code').value.trim().toUpperCase()+'/join','POST',{id:id()})));
+$('history').onclick=()=>run(async()=>{const result=await request('/api/history');alert(result.matches.map(m=>m.endedAt.replace('T',' ').slice(0,16)+' · '+m.hands+' 局 · '+m.id).join('\n')||'暂无已完成的对局');});
+$('settings').onclick=()=>{panel=panel==='settings'?'':'settings';render();};
+$('lobby-toggle').onclick=()=>{showLobby=!showLobby;render();};
+if(document.addEventListener)document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel){panel='';render();}});
+render();if(invitedRoom)$('code').value=invitedRoom;
+if(token&&(invitedRoom||sessionStorage.getItem('room')))run(async()=>{if(invitedRoom)await joinInvitation();else{room=await request('/api/rooms/'+sessionStorage.getItem('room'));render();await acknowledge();watch();}});
+</script>
+</html>

@@ -1,0 +1,33 @@
+'use strict';
+const {tile,typeOf}=require('../../lib/tiles');
+Component({
+  options:{virtualHost:true},
+  properties:{
+    tileId:{type:null,value:null},
+    wildcard:{type:Number,value:-1},
+    selected:{type:Boolean,value:false},
+    tiny:{type:Boolean,value:false},
+    small:{type:Boolean,value:false},
+    medium:{type:Boolean,value:false},
+    disabled:{type:Boolean,value:false},
+    faceDown:{type:Boolean,value:false},
+    standing:{type:Boolean,value:false},
+    flat:{type:Boolean,value:false},
+    size:{type:String,value:''},
+    called:{type:Boolean,value:false},
+    claimed:{type:Boolean,value:false},
+    addedTileId:{type:null,value:null},
+    characterSheet:{type:String,value:''},
+    characterColor:{type:String,value:'#8e3235'},
+  },
+  data:{face:tile(null),addedFace:tile(null),wild:false,hidden:true,showAdded:false},
+  observers:{
+    'tileId,wildcard,faceDown'(id,wildcard,faceDown){
+      this.setData({face:tile(id),wild:id!==null&&typeOf(id)===wildcard,hidden:id===null||faceDown===true});
+    },
+    addedTileId(id){
+      this.setData({addedFace:tile(id),showAdded:id!==null&&id!==undefined});
+    },
+  },
+  methods:{pick(){if(!this.data.disabled&&this.data.tileId!==null)this.triggerEvent('pick',{id:this.data.tileId});}},
+});

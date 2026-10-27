@@ -1,0 +1,161 @@
+<view wx:if="{{room && vm}}" class="game table-view" style="{{safeStyle}}">
+  <view class="table" aria-label="四人麻将牌桌">
+    <view class="board-info">
+      <view><text class="board-label">朝天</text><mahjong-tile tile-id="{{vm.indicator.id}}" wildcard="{{-1}}" size="indicator" disabled="{{true}}" /></view>
+      <view><text class="board-label">癞子</text><mahjong-tile tile-id="{{vm.wildcard.id}}" wildcard="{{room.match.hand.wildcardType}}" size="indicator" disabled="{{true}}" /></view>
+    </view>
+    <view class="room-heading">
+      <text class="room-title">{{room.testMode ? '单人测试' : '好友房'}} · {{room.code}}</text>
+      <text class="room-meta">每场 {{room.match.settings.handsPerMatch}} 局 · 第 {{room.match.hand.handNo}} 局</text>
+      <text class="room-meta">{{vm.status}}</text>
+    </view>
+    <view class="topbar-actions">
+      <button class="table-button" bindtap="toggleSettings" aria-expanded="{{settingsOpen}}">设置</button>
+      <button class="table-button" bindtap="lobby">大厅</button>
+    </view>
+
+    <view class="table-camera"><view class="table-world"><view class="table-surface" aria-hidden="true"></view>
+
+    <block wx:for="{{vm.opponents}}" wx:for-item="opponent" wx:key="seat">
+      <view class="opponent-rack {{opponent.position}}" data-seat="{{opponent.seat}}">
+        <view class="tiles">
+          <block wx:for="{{opponent.hand}}" wx:for-item="face" wx:key="key">
+            <view wx:if="{{face.gap}}" class="discard-gap" style="{{face.style}}" aria-hidden="true"></view>
+            <view wx:else class="rack-tile {{face.last ? 'latest' : ''}}"><mahjong-tile tile-id="{{face.id}}" size="opponent" standing="{{true}}" disabled="{{true}}" character-sheet="{{opponent.character.sheetUrl}}" character-color="{{opponent.character.color}}" /></view>
+          </block>
+        </view>
+        <view wx:if="{{opponent.melds.length || opponent.floated.length}}" class="meld-rack opponent-public {{opponent.position}}" data-seat="{{opponent.seat}}">
+          <template is="public-sets" data="{{player:opponent,wildcard:room.match.hand.wildcardType}}" />
+        </view>
+      </view>
+    </block>
+
+    <view class="pond-ring">
+      <view wx:for="{{vm.players}}" wx:for-item="player" wx:key="seat" class="pond {{player.position}}">
+        <view class="pond-tiles">
+          <mahjong-tile wx:for="{{player.discards}}" wx:for-item="face" wx:key="key" tile-id="{{face.id}}" wildcard="{{room.match.hand.wildcardType}}" size="river" flat="{{true}}" claimed="{{face.claimed}}" disabled="{{true}}" character-sheet="{{player.character.sheetUrl}}" character-color="{{player.character.color}}" />
+        </view>
+      </view>
+      <view class="center-square">
+        <view wx:for="{{vm.players}}" wx:for-item="player" wx:key="seat" class="center-score {{player.position}} {{player.acting ? 'acting' : ''}}">{{player.score}}<text class="center-unit">分</text></view>
+        <view class="center-core">
+          <text class="hand-progress">第 {{room.match.hand.handNo}} 局</text>
+          <text class="hand-progress-caption">共 {{room.match.settings.handsPerMatch}} 局</text>
+          <text class="center-remaining">余 {{room.match.hand.remaining}}</text>
+          <text class="center-status">{{room.match.hand.phase === 'own' ? '等待出牌' : vm.status}}</text>
+        </view>
+      </view>
+    </view>
+    </view></view>
+
+    <block wx:for="{{vm.players}}" wx:for-item="player" wx:key="seat">
+      <view wx:if="{{player.position !== 'bottom'}}" class="seat {{player.position}} {{player.acting ? 'acting' : ''}}" style="{{player.position === 'top' ? oppositeAvatarStyle : ''}}">
+        <view wx:if="{{player.seat !== room.seat}}" id="interaction-avatar-{{player.seat}}" class="avatar interaction-anchor" style="background:linear-gradient(145deg,{{player.character.color}},#192237)" data-seat="{{player.seat}}" bindtap="openInteraction" aria-role="button" aria-label="与{{player.name}}互动"><template is="emote-face" data="{{emotion:player.avatar}}" /></view>
+        <view wx:else id="interaction-avatar-{{player.seat}}" class="avatar interaction-anchor" data-seat="{{player.seat}}" style="background:linear-gradient(145deg,{{player.character.color}},#192237)"><template is="emote-face" data="{{emotion:player.avatar}}" /></view>
+        <view class="seat-meta">
+          <text class="seat-name"><text wx:if="{{player.dealer}}" class="dealer">庄</text>{{player.name}}</text>
+          <text class="seat-score">{{player.score}} 分</text>
+          <text class="seat-character">{{player.character.name}} · 飘 {{player.floats}}</text>
+          <text wx:if="{{player.position === 'top'}}" class="seat-floats">已飘 {{player.floats}} 张</text>
+        </view>
+        <view wx:if="{{player.emote}}" class="emote-bubble" aria-role="status"><template is="emote-face" data="{{emotion:player.emote}}" /><text class="emote-caption">{{player.emote.name}}</text></view>
+      </view>
+    </block>
+
+    <view class="rack bottom local-rack {{vm.self.melds.length || vm.self.floated.length ? 'has-public' : ''}}" data-seat="{{room.seat}}">
+      <view class="seat bottom local-player {{vm.self.acting ? 'acting' : ''}}">
+        <view id="interaction-avatar-{{room.seat}}" class="avatar interaction-anchor" data-seat="{{room.seat}}" style="background:linear-gradient(145deg,{{vm.self.character.color}},#192237)"><template is="emote-face" data="{{emotion:vm.self.avatar}}" /></view>
+        <view class="seat-meta"><text class="seat-name">{{vm.self.name}}</text></view>
+        <view wx:if="{{vm.self.emote}}" class="emote-bubble" aria-role="status"><template is="emote-face" data="{{emotion:vm.self.emote}}" /><text class="emote-caption">{{vm.self.emote.name}}</text></view>
+      </view>
+      <view class="tiles local-tiles">
+        <block wx:for="{{vm.self.hand}}" wx:for-item="face" wx:key="key">
+          <view wx:if="{{face.gap}}" class="discard-gap" style="{{face.style}}" aria-hidden="true"></view>
+          <view wx:else class="hand-slot {{face.last ? 'latest' : ''}}" data-index="{{face.handIndex}}" bindtouchstart="dragStart" bindtouchend="dragEnd" bindtouchcancel="dragCancel"><mahjong-tile tile-id="{{face.id}}" wildcard="{{room.match.hand.wildcardType}}" size="local" selected="{{selected === face.id}}" disabled="{{busy || room.match.hand.phase !== 'own' || room.match.hand.actor !== room.seat}}" character-sheet="{{vm.self.character.sheetUrl}}" character-color="{{vm.self.character.color}}" bind:pick="select" /></view>
+        </block>
+      </view>
+      <view wx:if="{{vm.self.melds.length || vm.self.floated.length}}" class="meld-rack bottom"><template is="public-sets" data="{{player:vm.self,wildcard:room.match.hand.wildcardType}}" /></view>
+    </view>
+
+    <view class="action-tray mahjong-actions">
+      <button class="action-btn {{sortEnabled ? 'active' : ''}}" bindtap="toggleSort" disabled="{{busy}}" aria-label="自动理牌" aria-pressed="{{sortEnabled}}">理</button>
+      <button class="action-btn {{vm.controls.autoWin ? 'active' : ''}}" data-key="autoWin" bindtap="toggleControl" disabled="{{busy || room.match.hand.phase === 'finished'}}" aria-label="自动胡牌" aria-pressed="{{vm.controls.autoWin}}">和</button>
+      <button class="action-btn {{vm.controls.skipCalls ? 'active' : ''}}" data-key="skipCalls" bindtap="toggleControl" disabled="{{busy || room.match.hand.phase === 'finished'}}" aria-label="免鸣：不吃碰杠" aria-pressed="{{vm.controls.skipCalls}}">鸣</button>
+      <button class="action-btn {{vm.controls.autoCut ? 'active' : ''}}" data-key="autoCut" bindtap="toggleControl" disabled="{{busy || room.match.hand.phase === 'finished'}}" aria-label="自动摸切" aria-pressed="{{vm.controls.autoCut}}">切</button>
+    </view>
+
+    <view wx:for="{{callEffects}}" wx:key="id" class="call-flash {{item.position}}" aria-role="status" aria-live="polite">{{item.label}}</view>
+    <view wx:if="{{vm.decisions.length}}" class="decision-menu">
+      <button wx:for="{{vm.decisions}}" wx:key="label" data-index="{{index}}" class="decision-button {{item.variant}}" disabled="{{busy}}" bindtap="decision" aria-label="{{item.label}}"><view class="decision-plate"></view><view class="decision-preview"><image wx:for="{{item.preview}}" wx:for-item="face" wx:key="key" src="{{face.image}}" mode="aspectFit" /></view><text class="decision-glyph">{{item.glyph}}</text><text class="decision-note">{{item.label}}</text></button>
+    </view>
+
+    <view class="table-tools">
+      <button wx:if="{{room.match.hand.phase === 'finished'}}" class="table-button result-shortcut" bindtap="openResult">本局结算</button>
+      <button class="table-button character-shortcut" bindtap="toggleCharacter">换牌背</button>
+      <button class="table-button primary" bindtap="toggleEmotes">表情</button>
+    </view>
+
+    <text wx:if="{{vm.payments.length && !error}}" class="last-payment">{{vm.payments[vm.payments.length - 1].text}}</text>
+    <text wx:if="{{error}}" class="error game-error">{{error}}</text>
+  </view>
+
+  <scroll-view wx:if="{{settingsOpen}}" scroll-y class="settings-panel card">
+    <view class="row"><text class="title grow">牌桌设置</text><button class="secondary" bindtap="toggleSettings">关闭</button></view>
+    <view class="settings-options">
+      <view class="row"><button class="secondary grow" bindtap="toggleCharacter">更换牌背</button><button class="secondary grow" bindtap="toggleEmotes">角色表情</button></view>
+      <button class="secondary" bindtap="toggleSort" disabled="{{busy}}" aria-pressed="{{sortEnabled}}">自动理牌：{{sortEnabled ? '开启' : '关闭'}}</button>
+      <button class="settings-section" bindtap="toggleCode" aria-expanded="{{codeExpanded}}">{{codeExpanded ? '−' : '＋'}} 牌山校验码</button>
+      <view wx:if="{{codeExpanded}}"><text class="label">发牌前记录的校验码</text><text selectable class="code-text">{{room.match.hand.wallCode}}</text><button class="secondary" bindtap="copyCode">复制校验码</button></view>
+      <button class="settings-section" bindtap="togglePayments" aria-expanded="{{paymentsExpanded}}">{{paymentsExpanded ? '−' : '＋'}} 本局收支</button>
+      <view wx:if="{{paymentsExpanded}}"><text wx:if="{{!vm.payments.length}}" class="muted">本局暂无收支</text><text wx:for="{{vm.payments}}" wx:key="key" class="payment-text">{{item.text}}</text></view>
+      <view class="rules-note"><text class="rules-label">本局规则：{{room.match.hand.rulesVersion}}</text><text class="muted">明杠/补杠无飘时每位 1 分，暗杠每位 2 分；明杠仅由点杠者支付。有飘时按双方已飘张数翻倍。</text></view>
+      <button class="settings-section" bindtap="toggleHelp" aria-expanded="{{helpExpanded}}">{{helpExpanded ? '−' : '＋'}} 操作说明</button>
+      <text wx:if="{{helpExpanded}}" class="muted">点牌选中，再点同一张牌打出。“理”自动理牌，“和”自动胡牌，“鸣”免鸣（不吃碰杠），“切”自动摸切；同时开启“和、切”时先胡牌。碰杠或过牌、手动自摸使用另行出现的选择。起手和碰后没有新摸牌时仍需手动出牌；摸到癞子时依法飘牌，不能飘时等待手动切普通牌。关闭“理”后可拖动排序。</text>
+      <text class="muted">房间 {{room.code}} · 每场 {{room.match.settings.handsPerMatch}} 局</text>
+      <button class="secondary" bindtap="replays">历史牌谱</button>
+      <button wx:if="{{room.testMode}}" class="danger" disabled="{{busy}}" bindtap="exitTest">结束测试</button>
+      <button wx:else class="secondary" open-type="share">邀请好友</button>
+      <text wx:if="{{room.testMode}}" class="muted">机器人有杠先杠、可碰就碰，其余随机出牌；摸到癞子时按规则飘，不能飘时随机打出普通牌。机器人不自动胡牌。结束测试会放弃未完成的本场进度。</text>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{characterOpen}}" class="character-panel card">
+    <view class="row"><text class="title grow">选择角色牌背</text><button size="mini" class="secondary" bindtap="toggleCharacter">关闭</button></view>
+    <view class="character-gallery">
+      <button wx:for="{{characters}}" wx:key="id" class="character-choice {{selectedCharacter === item.id ? 'active' : ''}}" style="background:linear-gradient(145deg,{{item.color}},#0d2026)" data-id="{{item.id}}" bindtap="chooseCharacter" aria-label="选择{{item.name}}牌背"><view class="character-art"><image class="character-sheet" src="{{item.sheetUrl}}" mode="scaleToFill" /></view><text class="character-name">{{item.name}}</text><text class="character-pose">{{item.pose}}</text><text class="choice-mark">{{selectedCharacter === item.id ? '已选中' : ''}}</text></button>
+    </view>
+    <text class="muted">角色牌背与头像会同步更换，并广播给同桌玩家。</text>
+  </view>
+
+  <view wx:if="{{vm.result && showResult && !winEffect}}" class="overlay"><view class="result-card card"><view class="row"><text class="title grow">{{vm.result.complete ? '大局结算' : '小局结算'}}</text><button class="secondary" bindtap="closeResult">查看牌桌</button></view><scroll-view scroll-y class="settlement-body"><view wx:if="{{vm.result.complete}}" class="match-final"><text class="label">大局结束 · 最终分数</text><view class="final-scores"><view wx:for="{{vm.result.scores}}" wx:key="seat"><text>{{item.name}}</text><text class="final-number">{{item.total}} 分</text></view></view></view><text class="muted">第 {{room.match.hand.handNo}} / {{room.match.settings.handsPerMatch}} 小局 · {{vm.result.label}}</text><text wx:if="{{vm.result.streak}}" class="streak-summary">{{vm.result.streak.label}} · {{vm.result.streak.english}}</text><view class="settlement-players"><template wx:for="{{vm.result.scores}}" wx:key="seat" is="settlement-player" data="{{row:item,wildcard:room.match.hand.wildcardType}}" /></view><text class="muted">本局加减分已包含此前结算的杠牌和飘癞子收支。</text><text wx:for="{{vm.eventPayments}}" wx:key="key" class="payment-text">{{item.text}}</text><text wx:for="{{vm.winPayments}}" wx:key="key" class="payment-text">{{item.text}}</text></scroll-view><text wx:if="{{vm.result.complete}}" class="muted">已准备 {{vm.readyCount}} / 4</text><view class="row result-actions"><button class="secondary" bindtap="verify">验证牌山</button><button class="secondary" bindtap="replays">查看牌谱</button><button wx:if="{{room.match.status === 'active'}}" class="primary grow" disabled="{{busy || room.match.continueReady[room.seat]}}" bindtap="next">{{room.match.continueReady[room.seat] ? '等待朋友继续' : '下一局'}}</button><button wx:else class="primary grow" disabled="{{busy}}" bindtap="restart">{{room.ready[room.seat] ? '取消准备' : '再来一局'}}</button><button wx:if="{{vm.result.complete}}" class="secondary" bindtap="lobby">返回房间</button></view></view></view>
+
+  <scroll-view wx:if="{{emoteOpen}}" scroll-y class="emote-panel card">
+    <view class="row"><text class="grow">{{emotePack === 'interaction' ? '与' + interactionName + '互动' : '选择表情包'}}</text><button size="mini" class="secondary" bindtap="toggleEmotes">关闭</button></view><text class="muted">{{emotePack === 'interaction' ? '每人每局 ' + vm.interactionLimit + ' 次 · 两种道具共用' : '显示三秒 · 每三秒可发送一次'}}</text>
+    <view class="row emote-tabs"><button class="{{emotePack === 'character' ? 'primary' : 'secondary'}} grow" data-pack="character" bindtap="chooseEmotePack">角色表情</button><button class="{{emotePack === 'common' ? 'primary' : 'secondary'}} grow" data-pack="common" bindtap="chooseEmotePack">通用表情</button><button class="{{emotePack === 'interaction' ? 'primary' : 'secondary'}} grow" data-pack="interaction" bindtap="chooseEmotePack">互动道具</button></view>
+    <view wx:if="{{emotePack !== 'interaction'}}" class="emote-grid {{emotePack === 'common' ? 'common' : ''}}"><button wx:for="{{emotePack === 'common' ? vm.commonEmotes : vm.emoteChoices}}" wx:key="id" class="emote-option" data-emote="{{item.id}}" disabled="{{busy || vm.self.emote}}" bindtap="emote" aria-label="发送{{item.name}}表情"><template is="emote-face" data="{{emotion:item}}" /><text>{{item.name}}</text></button></view>
+    <view wx:if="{{emotePack === 'interaction'}}"><view class="interaction-targets"><button wx:for="{{vm.interactionTargets}}" wx:key="seat" data-seat="{{item.seat}}" class="{{interactionTarget === item.seat ? 'primary' : 'secondary'}}" bindtap="chooseInteractionTarget" aria-pressed="{{interactionTarget === item.seat}}">{{item.name}}</button></view><text class="muted">{{vm.canInteract ? '本局剩余 ' + vm.interactionRemaining + ' / ' + vm.interactionLimit + ' 次' : '发牌后可使用互动道具'}}</text><view class="interaction-grid"><button wx:for="{{vm.interactionChoices}}" wx:key="id" data-effect="{{item.id}}" disabled="{{busy || !vm.canInteract || vm.interactionRemaining <= 0 || interactionTarget === null}}" bindtap="interaction" aria-label="{{item.name}}"><text class="common-emoji">{{item.emoji}}</text><text>{{item.name}}</text></button></view></view>
+  </scroll-view>
+
+  <canvas id="interaction-canvas" type="2d" class="interaction-canvas" aria-hidden="true"></canvas>
+  <block wx:for="{{interactionEffects}}" wx:key="key"><block wx:if="{{item.active}}">
+    <text class="interaction-announcement" aria-role="status" aria-live="polite">{{item.label}}</text>
+    <view class="interaction-static" style="{{item.staticStyle}}" aria-hidden="true"><view wx:if="{{item.effect === 'water'}}" class="water-cube" style="{{item.faceStyle}}"><view class="cube-eye left"></view><view class="cube-eye right"></view><view class="cube-mouth"></view></view><view wx:else class="tomato-splat"></view></view>
+  </block></block>
+  <view wx:if="{{winEffect}}" class="win-celebration" style="--win-duration:{{winEffect.duration}}ms" aria-role="text" aria-label="{{winEffect.winner}}，自摸，{{winEffect.kind}}"><view class="win-rays"></view><view class="win-halo"></view><view wx:for="{{winEffect.sparks}}" wx:key="*this" class="win-spark" style="transform:rotate({{item}}deg)"><view class="win-spark-ray"></view></view><view class="win-ribbon"><text class="win-winner">{{winEffect.winner}}</text><text class="win-glyph">自摸</text><text class="win-kind">{{winEffect.kind}}</text><view wx:if="{{winEffect.badge}}" class="win-streak streak-{{winEffect.badge.level}}"><text class="win-streak-label">{{winEffect.badge.label}}</text><text class="win-streak-english">{{winEffect.badge.english}}</text></view></view></view>
+</view>
+<view wx:else class="screen"><text>正在连接牌桌…</text><text class="error">{{error}}</text></view>
+<template name="emote-face"><text wx:if="{{emotion.emoji}}" class="common-emoji">{{emotion.emoji}}</text><view wx:else class="emote-sprite"><image src="{{emotion.sheet}}" class="emote-sheet" style="left:{{emotion.x}}%;top:{{emotion.y}}%" mode="scaleToFill" /></view></template>
+<template name="settlement-player"><view class="settlement-player"><view class="settlement-score"><text class="settlement-name">{{row.name}}</text><text class="{{row.deltaUnits > 0 ? 'score-gain' : row.deltaUnits < 0 ? 'score-loss' : ''}}">本局 {{row.delta}} 分</text><text>累计 {{row.total}} 分</text></view><view class="settlement-cards"><view class="settlement-group"><text class="muted">手牌</text><view class="settlement-tiles"><mahjong-tile wx:for="{{row.hand}}" wx:key="key" tile-id="{{item.id}}" wildcard="{{wildcard}}" medium="{{true}}" disabled="{{true}}" /></view></view><view wx:for="{{row.melds}}" wx:key="key" class="settlement-group"><text class="muted">{{item.label}}</text><view class="settlement-tiles"><mahjong-tile wx:for="{{item.tiles}}" wx:for-item="face" wx:key="key" tile-id="{{face.id}}" wildcard="{{wildcard}}" medium="{{true}}" disabled="{{true}}" /></view></view><view wx:if="{{row.floated.length}}" class="settlement-group"><text class="muted">已飘</text><view class="settlement-tiles"><mahjong-tile wx:for="{{row.floated}}" wx:key="key" tile-id="{{item.id}}" wildcard="{{wildcard}}" medium="{{true}}" disabled="{{true}}" /></view></view></view></view></template>
+
+<template name="public-sets">
+        <view wx:if="{{player.melds.length || player.position === 'bottom'}}" class="melds">
+          <view wx:for="{{player.melds}}" wx:for-item="meld" wx:key="key" class="meld {{meld.kind === 'addedKong' ? 'has-added' : ''}}">
+            <mahjong-tile wx:for="{{meld.tiles}}" wx:for-item="face" wx:key="key" tile-id="{{face.id}}" wildcard="{{wildcard}}" size="meld-face" flat="{{true}}" disabled="{{true}}" face-down="{{face.faceDown}}" called="{{face.called}}" added-tile-id="{{face.addedId}}" character-sheet="{{player.character.sheetUrl}}" character-color="{{player.character.color}}" />
+            <text class="meld-source">{{meld.label}} · {{meld.source}}</text>
+          </view>
+        </view>
+        <view wx:if="{{player.floated.length}}" class="floated-row">
+          <mahjong-tile tile-id="{{player.floated[0].id}}" wildcard="{{wildcard}}" size="meld-face" flat="{{true}}" disabled="{{true}}" character-sheet="{{player.character.sheetUrl}}" character-color="{{player.character.color}}" />
+          <view class="floated-caption"><text class="floated-label">飘癞子</text><text class="floated-count">×{{player.floated.length}}</text></view>
+        </view>
+</template>

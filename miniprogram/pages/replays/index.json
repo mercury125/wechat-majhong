@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "历史牌谱",
+  "usingComponents": { "mahjong-tile": "/components/tile/index" }
+}

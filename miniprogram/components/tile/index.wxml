@@ -1,0 +1,17 @@
+<template name="tile-model">
+  <view class="tile-face tile-front {{hidden ? 'is-hidden' : ''}}">
+    <image wx:if="{{!hidden}}" class="tile-face-bg" src="/assets/tiles/Front.png" mode="scaleToFill" />
+    <image wx:if="{{!hidden}}" class="tile-art" src="{{face.image}}" mode="scaleToFill" />
+    <view wx:if="{{hidden}}" class="role-back"><image wx:if="{{characterSheet}}" class="role-sheet" src="{{characterSheet}}" mode="scaleToFill" /></view>
+    <text wx:if="{{wild && !hidden}}" class="badge">癞</text>
+  </view>
+  <view class="tile-face tile-back"><view class="role-back"><image wx:if="{{characterSheet}}" class="role-sheet" src="{{characterSheet}}" mode="scaleToFill" /></view></view>
+  <view class="tile-face tile-top"></view>
+  <view class="tile-face tile-base"></view>
+  <view class="tile-face tile-left"></view>
+  <view class="tile-face tile-right"></view>
+</template>
+<view class="tile {{size}} {{tiny ? 'tiny' : ''}} {{small ? 'small' : ''}} {{medium ? 'medium' : ''}} {{selected ? 'selected' : ''}} {{wild ? 'wild' : ''}} {{hidden ? 'is-hidden' : ''}} {{called ? 'called' : ''}} {{claimed ? 'claimed' : ''}} {{standing ? 'standing' : ''}} {{flat ? 'flat' : ''}}" style="--character:{{characterColor}}" bindtap="pick" aria-role="{{disabled ? 'img' : 'button'}}" aria-label="{{hidden ? '暗牌' : face.name}}{{wild ? '，癞子' : ''}}">
+  <view class="tile-model"><template is="tile-model" data="{{face:face,hidden:hidden,wild:wild,characterSheet:characterSheet}}" /></view>
+  <view wx:if="{{showAdded}}" class="tile-model tile-added-model"><template is="tile-model" data="{{face:addedFace,hidden:false,wild:false,characterSheet:characterSheet}}" /></view>
+</view>

@@ -1,0 +1,35 @@
+<view class="screen lobby" style="{{safeStyle}}">
+  <view class="header"><text class="title">好友麻将</text><text class="pill">108 张牌 · 仅限自摸</text><text wx:if="{{development}}" class="pill">本地试玩</text></view>
+  <view wx:if="{{!user}}" class="welcome card">
+    <form bindsubmit="login">
+      <view class="column">
+        <text class="welcome-title">和朋友一起打麻将。</text><text class="muted">三副面子加一对雀头，支持癞子、飘癞子和牌山验证。</text>
+        <input name="nickname" type="{{development ? 'text' : 'nickname'}}" placeholder="{{development ? '输入你的昵称' : '点击使用微信昵称，也可自行填写'}}" maxlength="32" value="{{name}}" data-key="name" bindinput="field" bindblur="field" aria-label="玩家昵称" />
+        <text wx:if="{{!development}}" class="muted">首次选择昵称，之后自动恢复微信身份。</text>
+        <button class="primary welcome-submit" loading="{{busy}}" disabled="{{busy}}" form-type="submit">{{development ? '创建试玩身份' : '微信登录并进入'}}</button>
+      </view>
+    </form>
+  </view>
+  <view wx:elif="{{!room}}" class="lobby-grid">
+    <view class="card column"><text class="section-title">欢迎，{{user.name}}</text><text class="label">每场局数</text><input type="number" value="{{handsPerMatch}}" data-key="handsPerMatch" bindinput="field" aria-label="每场局数" /><button class="primary" disabled="{{busy}}" bindtap="create">创建房间</button><button class="secondary" disabled="{{busy}}" bindtap="testMode">单人测试 · 三位机器人</button><text class="muted">机器人有杠先杠、可碰就碰，其余随机出牌。</text></view>
+    <view class="card column"><text class="section-title">加入朋友的牌桌</text><input placeholder="输入 8 位房间号" maxlength="8" value="{{joinCode}}" data-key="joinCode" bindinput="field" aria-label="房间号" /><button class="secondary" disabled="{{busy}}" bindtap="join">加入房间</button><view class="row"><button class="secondary" bindtap="history">历史牌谱</button><button class="secondary" bindtap="calculator">牌山计算器</button></view></view>
+    <view class="card column character-card">
+      <view><text class="section-title">选一位，陪你摸牌。</text><text class="muted">角色牌背与专属表情</text></view>
+      <view class="character-gallery">
+        <button wx:for="{{characters}}" wx:key="id" class="character-choice {{selectedCharacter === item.id ? 'active' : ''}}" style="background:linear-gradient(145deg,{{item.color}},#0d2026)" data-id="{{item.id}}" bindtap="chooseCharacter" aria-label="选择{{item.name}}牌背">
+          <view class="character-art"><image class="character-sheet" src="{{item.sheetUrl}}" mode="scaleToFill" /></view>
+          <text class="character-name">{{item.name}}</text>
+          <text class="character-pose">{{item.pose}}</text>
+          <text class="choice-mark">{{selectedCharacter === item.id ? '已选中' : ''}}</text>
+        </button>
+      </view>
+      <text class="muted">当前牌背：{{selectedCharacter === 'ironclad' ? '战士' : selectedCharacter === 'silent' ? '猎人' : selectedCharacter === 'defect' ? '机器人' : '观者'}}</text>
+    </view>
+    <view wx:if="{{rooms.length}}" class="saved"><button wx:for="{{rooms}}" wx:key="code" class="secondary" data-code="{{item.code}}" bindtap="reconnect">{{item.testMode ? '单人测试' : (item.active ? '重连房间' : '打开房间')}} {{item.code}}</button></view>
+  </view>
+  <view wx:else class="room-layout">
+    <view class="card room-summary column"><text class="label">{{room.testMode ? '单人测试' : '好友房间'}}</text><text class="room-code">{{room.code}}</text><view wx:if="{{!room.testMode}}" class="row"><button size="mini" class="secondary" bindtap="copy">复制</button><button size="mini" class="secondary" open-type="share">邀请好友</button></view><view class="row"><input class="grow" type="number" value="{{handsPerMatch}}" data-key="handsPerMatch" bindinput="field" aria-label="每场局数" /><button wx:if="{{room.ownerId === user.id}}" class="secondary" disabled="{{busy}}" bindtap="saveSettings">设置局数</button></view><text class="muted">{{room.settings.handsPerMatch}} 局 · 四人准备好后自动开始 · 无出牌倒计时</text><view class="row"><button class="secondary" bindtap="history">历史牌谱</button><button class="secondary" disabled="{{busy}}" bindtap="leave">{{room.testMode ? '结束测试' : '离开房间'}}</button></view></view>
+    <view class="card seat-panel column"><view class="seats"><view wx:for="{{seatCards}}" wx:key="seat" class="seat {{room.seat === item.seat ? 'mine' : ''}}"><text class="label">{{item.seat + 1}} 号位</text><block wx:if="{{item.player}}"><text>{{item.player.name}}</text><text class="muted">{{item.ready ? '✓ 已准备' : '未准备'}}</text></block><button wx:else class="secondary" data-seat="{{item.seat}}" bindtap="sit" disabled="{{busy}}">选择此座位</button></view></view><view class="row"><button wx:if="{{room.match}}" class="grow primary" bindtap="table">返回牌桌</button><button wx:if="{{!room.match || room.match.status !== 'active'}}" class="grow primary" disabled="{{busy}}" bindtap="ready">{{room.ready[room.seat] ? '取消准备' : '准备'}}</button></view></view>
+  </view>
+  <text wx:if="{{error}}" class="error">{{error}}</text>
+</view>

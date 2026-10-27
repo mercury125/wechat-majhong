@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "好友牌桌",
+  "usingComponents": { "mahjong-tile": "/components/tile/index" },
+  "backgroundColor": "#080e1b",
+  "disableScroll": true
+}
